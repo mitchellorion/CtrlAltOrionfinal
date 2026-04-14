@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Ctrl+Alt+Orion — Broadsheet</title>
+<style>
+@import url("webfonts/Relaxe/stylesheet.css");
+@import url("webfonts/Helvena_Black/stylesheet.css");
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;500&display=swap');
+
+@font-face{
+    font-family: Relaxe;
+    src: url('fonts/RailwayGank.ttf')format('truetype');
+}
+@font-face{
+    font-family: 'GhostinJingle';
+    src: url('fonts/GhostinJingle.ttf') format('truetype');
+}
+@font-face{
+    font-family: 'ClevonStamp';
+    src: url('fonts/ClevonStamp.ttf') format('truetype');
+}
+@font-face{
+    font-family: "Helvena Black";
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 300;
+    line-height: 0pc;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#FAFAF8;--ink:#080808;--red:#CC0000;--muted:#555;--light:#ECECEA;
+  --border:1px solid #CECECE;--border-ink:1px solid #080808;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:'ClevonStamp',monospace;overflow-x:hidden;cursor:none;}
+
+/* CURSOR */
+#cd{width:10px;height:10px;background:var(--ink);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);}
+#cr{width:36px;height:36px;border:var(--border-ink);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .15s,height .15s;}
+body.ch #cr{width:52px;height:52px;border-color:var(--red);}
+body.ch #cd{background:var(--red);}
+
+/* HUD */
+#hud{position:fixed;bottom:0;right:0;z-index:500;background:var(--ink);color:var(--bg);padding:8px 18px;font-family:'ClevonStamp',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;border-top:var(--border-ink);border-left:var(--border-ink);opacity:0;transition:opacity .2s;}
+#hud.vis{opacity:1;}
+
+@keyframes fu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes mq{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes tickertape{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+/* newsprint noise */
+@keyframes noise{0%{background-position:0 0}100%{background-position:100% 100%}}
+
+/* NAV — masthead */
+#nav{position:fixed;inset:0 0 auto 0;z-index:200;background:var(--bg);border-bottom:3px solid var(--ink);}
+.nav-top{display:flex;align-items:stretch;height:56px;}
+.nav-logo{font-family:'ClevonStamp',sans-serif;font-size:13px;letter-spacing:1px;text-decoration:none;color:var(--ink);display:flex;align-items:center;padding:0 28px;border-right:var(--border-ink);text-transform:uppercase;gap:6px;}
+.nkm{display:inline-flex;align-items:center;justify-content:center;background:var(--ink);padding:3px 8px;font-size:9px;letter-spacing:1px;color:var(--bg);}
+.nkm.c{background:var(--red);color:#fff;}
+.nav-date{display:flex;align-items:center;padding:0 20px;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;border-right:var(--border);}
+.nav-links{display:flex;align-items:stretch;list-style:none;margin-left:auto;}
+.nav-links li{border-left:var(--border);}
+.nav-links a{display:flex;align-items:center;padding:0 20px;font-size:9px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;color:var(--ink);transition:background .12s,color .12s;}
+.nav-links a:hover{background:var(--ink);color:var(--bg);}
+.nav-links a.cta{background:var(--red);color:#fff;}
+.nav-links a.cta:hover{background:var(--ink);}
+/* ticker below nav */
+.ticker{background:var(--ink);color:var(--bg);overflow:hidden;height:28px;display:flex;align-items:center;font-size:8px;letter-spacing:2px;text-transform:uppercase;}
+.ticker-inner{display:flex;white-space:nowrap;width:max-content;animation:tickertape 20s linear infinite;}
+.tick{padding:0 32px;color:rgba(255,255,255,.7);}
+.tick.red{color:var(--red);font-weight:bold;}
+#nav-toggle{display:none;align-items:center;justify-content:center;background:none;border:none;border-left:var(--border);cursor:none;padding:0 20px;margin-left:auto;}
+#nav-toggle span{display:block;width:18px;height:1.5px;background:var(--ink);margin:4.5px 0;}
+#mmenu{display:none;position:fixed;inset:0;z-index:190;background:var(--bg);flex-direction:column;align-items:flex-start;justify-content:center;gap:0;border-right:var(--border-ink);}
+#mmenu.open{display:flex;}
+#mmenu a{font-family:'ClevonStamp',sans-serif;font-size:clamp(28px,6vw,56px);color:var(--ink);text-decoration:none;letter-spacing:2px;text-transform:uppercase;padding:16px 52px;border-bottom:var(--border-ink);width:100%;transition:background .12s;}
+#mmenu a:first-child{border-top:var(--border-ink);}
+#mmenu a:hover{background:var(--light);}
+
+/* HERO — broadsheet layout */
+#hero{min-height:100vh;display:grid;grid-template-columns:1fr 40%;position:relative;overflow:hidden;padding-top:84px;border-bottom:var(--border-ink);}
+.hero-left{display:grid;grid-template-rows:auto 1fr;border-right:var(--border-ink);}
+.hero-col1{padding:40px 48px;display:flex;flex-direction:column;justify-content:flex-end;}
+.edition-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 48px;border-bottom:3px double var(--ink);background:var(--bg);}
+.edition-l{font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+.edition-r{font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+.big-headline{font-size:clamp(34px,6.5vw,92px);line-height:1.05;letter-spacing:3px;color:var(--ink);margin-bottom:16px;animation:fu .5s ease both;}
+.big-headline .hl-stamp{font-family:'ClevonStamp',sans-serif;letter-spacing:4px;}
+.big-headline .hl-fancy{font-family:'GhostinJingle',sans-serif;color:var(--red);letter-spacing:4px;}
+.col-rule{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:var(--border-ink);margin-top:20px;}
+.col1{padding:20px 24px 20px 0;border-right:var(--border-ink);}
+.col2{padding:20px 0 20px 24px;}
+.dropcap::first-letter{font-family:'ClevonStamp',sans-serif;font-size:48px;float:left;line-height:.75;padding-right:8px;padding-top:4px;color:var(--ink);}
+.coltext{font-size:11px;line-height:1.85;color:var(--ink);}
+.byline{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.hkeys{display:flex;align-items:center;gap:10px;margin-top:20px;flex-wrap:wrap;}
+.key{display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#f5f5f3 0%,var(--bg) 60%);border:var(--border-ink);border-radius:6px;box-shadow:0 6px 0 #1a1a1a,0 7px 3px rgba(0,0,0,.35);padding:14px 22px;font-family:'ClevonStamp',sans-serif;font-size:clamp(12px,2vw,18px);letter-spacing:1px;color:var(--ink);cursor:pointer;user-select:none;transition:transform .08s,box-shadow .08s;}
+.key.pressed{transform:translateY(5px);box-shadow:0 1px 0 #1a1a1a,0 2px 2px rgba(0,0,0,.25);}
+.key.kc{background:linear-gradient(180deg,#e00 0%,var(--red) 60%);border-color:var(--red);box-shadow:0 6px 0 #7a0000,0 7px 3px rgba(0,0,0,.35);color:#fff;}
+.key.kc.pressed{box-shadow:0 1px 0 #7a0000,0 2px 2px rgba(0,0,0,.25);}
+.kplus{font-size:14px;color:var(--muted);}
+.hctas{display:flex;gap:0;margin-top:24px;}
+.bp{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--bg);text-decoration:none;padding:13px 28px;font-family:'ClevonStamp',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;border:var(--border-ink);transition:background .12s,color .12s;}
+.bp:hover{background:var(--red);}
+.bs{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--ink);text-decoration:none;padding:13px 28px;font-family:'ClevonStamp',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;border:var(--border-ink);border-left:none;transition:background .12s,color .12s;}
+.bs:hover{background:var(--light);}
+
+/* right panel */
+.hero-right{position:relative;overflow:hidden;}
+.img-panel{position:absolute;inset:0;background-color:var(--ink);background-image:url('images/mitchell.png');background-size:cover;background-position:center top;filter:grayscale(40%) contrast(1.1);}
+/* halftone overlay */
+.img-panel::after{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(0,0,0,.12) 1px,transparent 1px);background-size:4px 4px;pointer-events:none;}
+/* caption bar */
+.img-caption{position:absolute;bottom:0;left:0;right:0;background:var(--bg);border-top:var(--border-ink);padding:8px 16px;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;z-index:2;}
+/* photo credit stamp */
+.photo-stamp{position:absolute;top:14px;right:14px;background:var(--red);color:#fff;padding:4px 10px;font-size:7px;letter-spacing:3px;text-transform:uppercase;z-index:2;transform:rotate(-2deg);}
+
+/* MARQUEE */
+.mwrap{background:var(--light);border-top:var(--border-ink);border-bottom:var(--border-ink);overflow:hidden;}
+.mtrack{display:flex;width:max-content;animation:mq 22s linear infinite;}
+.mitem{font-family:'ClevonStamp',monospace;font-size:8px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;white-space:nowrap;padding:10px 24px;display:flex;align-items:center;gap:24px;}
+.mitem::after{content:'|';color:var(--border-ink);}
+
+/* SECTIONS */
+.sec{padding:80px 52px;border-top:var(--border-ink);}
+.slabel{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.slabel::before{content:'§';color:var(--red);}
+.stitle{font-family:'ClevonStamp',sans-serif;font-size:clamp(22px,4.5vw,52px);line-height:.9;letter-spacing:1px;margin-bottom:16px;color:var(--ink);}
+.stitle em{font-family:'GhostinJingle',sans-serif;color:var(--red);font-style:normal;text-transform:none;letter-spacing:2px;}
+.sdesc{color:var(--muted);font-size:11px;line-height:1.85;max-width:540px;letter-spacing:.3px;}
+.rv{opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s;}
+.rv.vis{opacity:1;transform:none;}
+.d1{transition-delay:.1s;}.d2{transition-delay:.2s;}.d3{transition-delay:.3s;}
+.column-rule{width:100%;border-top:3px double var(--ink);margin:12px 0;}
+
+
+/* shared column separator */
+.col-sep{background:var(--ink);width:3px;align-self:stretch;}
+
+/* WHY — two-column editorial */
+#why{background:var(--light);}
+.winn{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 3px 1fr;gap:0;}
+.wleft{padding-right:40px;}
+.wright{padding-left:40px;}
+.pull-quote{border-left:4px solid var(--red);padding:14px 20px;margin:20px 0;font-family:'ClevonStamp',sans-serif;font-size:18px;line-height:1.15;text-transform:uppercase;letter-spacing:.5px;}
+.plist{display:flex;flex-direction:column;gap:0;margin-top:12px;}
+.pitem{display:flex;align-items:center;gap:14px;border-bottom:var(--border);padding:14px 0;transition:padding-left .15s;}
+.pitem:hover{padding-left:6px;background:transparent;}
+.pitem:hover .pt strong{color:var(--red);}
+.pico{width:30px;height:30px;border:var(--border-ink);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.pt{flex:1;}.pt strong{display:block;font-size:12px;font-family:'ClevonStamp',sans-serif;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;transition:color .15s;}
+.pt span{font-size:9px;color:var(--muted);}
+.psave{font-size:12px;font-family:'ClevonStamp',sans-serif;color:var(--muted);}
+.pitem.us{background:var(--bg);}
+.pitem.us .pt strong{color:var(--red);}
+.pitem.us .psave{color:var(--red);}
+.strike{position:relative;display:inline;}
+.strike::after{content:'';position:absolute;left:-2px;right:-2px;top:52%;height:2px;background:var(--red);}
+
+/* PRICING MODAL */
+.pricing-teaser{border:var(--border-ink);border-top:none;margin-top:0;}
+.pricing-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:var(--border);}
+.pricing-row:last-child{border-bottom:none;}
+.pr-name{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.pr-cost{font-family:'ClevonStamp',sans-serif;font-size:13px;letter-spacing:.5px;color:var(--ink);}
+.pricing-row.ours .pr-name{color:var(--red);}
+.pricing-row.ours .pr-cost{color:var(--red);}
+.pricing-open-btn{
+  display:flex;align-items:center;justify-content:space-between;width:100%;
+  background:var(--red);color:#fff;border:none;border-top:3px solid var(--ink);
+  padding:16px 20px;font-family:'ClevonStamp',sans-serif;font-size:12px;
+  letter-spacing:2px;text-transform:uppercase;cursor:none;transition:background .12s;
+  margin-top:24px;
+}
+.pricing-open-btn:hover{background:var(--ink);}
+
+#pricing-overlay{
+  display:none;position:fixed;inset:0;background:rgba(8,8,8,.9);z-index:300;
+  align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto;
+}
+#pricing-overlay.open{display:flex;}
+#pricing-modal{
+  background:var(--bg);border:var(--border-ink);border-top:4px solid var(--red);
+  width:100%;max-width:840px;padding:52px;margin:auto;
+}
+.pm-head{margin-bottom:36px;}
+.pm-title{font-family:'ClevonStamp',sans-serif;font-size:clamp(22px,4vw,44px);line-height:.9;letter-spacing:1px;color:var(--ink);margin-bottom:6px;}
+.pm-title em{font-family:'GhostinJingle',sans-serif;color:var(--red);font-style:normal;letter-spacing:2px;}
+.pm-sub{font-size:11px;color:var(--muted);line-height:1.85;letter-spacing:.3px;}
+
+.pm-slider{display:flex;align-items:center;gap:16px;padding:16px 20px;border:var(--border-ink);margin-bottom:28px;}
+.pm-slider label{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+.pm-slider input[type=range]{flex:1;accent-color:var(--red);}
+.pm-slider span{font-family:'ClevonStamp',sans-serif;font-size:16px;letter-spacing:1px;min-width:72px;text-align:right;}
+
+.pm-price{border:3px solid var(--red);padding:22px 24px;margin-bottom:32px;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.pm-price .lbl{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.pm-price .amt{font-family:'ClevonStamp',sans-serif;font-size:clamp(32px,5vw,56px);line-height:.9;letter-spacing:1px;color:var(--red);}
+.pm-price .note{font-size:10px;color:var(--muted);letter-spacing:.5px;align-self:flex-end;}
+
+.pm-slabel{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.pm-slabel::before{content:'§';color:var(--red);}
+
+.pm-addons{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:0;border:var(--border-ink);margin-bottom:32px;}
+.pm-addon{border-right:var(--border-ink);border-bottom:var(--border-ink);padding:10px 14px;cursor:none;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .12s;user-select:none;}
+.pm-addon:hover{background:var(--light);}
+.pm-addon.on{background:var(--light);}
+.pm-addon .aname{font-size:11px;color:var(--ink);letter-spacing:.3px;}
+.pm-addon .aprice{font-size:10px;color:var(--muted);}
+.pm-addon.on .aprice{color:var(--red);}
+.pm-addon .pm-chk{width:14px;height:14px;border:var(--border-ink);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.pm-addon.on .pm-chk{background:var(--red);border-color:var(--red);}
+.pm-addon.on .pm-chk::after{content:'';display:block;width:6px;height:4px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px);}
+
+.pm-yr-row{display:flex;margin-bottom:8px;}
+.pm-yr-row button{flex:1;padding:10px;font-family:'ClevonStamp',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;border:var(--border-ink);border-right:none;background:transparent;color:var(--muted);cursor:none;transition:.12s;}
+.pm-yr-row button:last-child{border-right:var(--border-ink);}
+.pm-yr-row button.on{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+.pm-yr-row button:hover:not(.on){background:var(--light);}
+.pm-yr-note{font-size:10px;color:var(--muted);letter-spacing:.5px;margin-bottom:20px;}
+
+.pm-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:32px;}
+.pm-table th{text-align:left;padding:8px 12px;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border-bottom:3px solid var(--ink);}
+.pm-table td{padding:9px 12px;border-bottom:var(--border);vertical-align:middle;color:var(--muted);}
+.pm-table tr.you td{color:var(--ink);font-family:'ClevonStamp',sans-serif;letter-spacing:.5px;}
+.pm-table tr.you td:first-child{color:var(--red);}
+.pm-table .ptag{display:inline-block;font-size:9px;padding:1px 7px;border:var(--border);color:var(--muted);margin-left:4px;letter-spacing:.5px;}
+.pm-table .ptag.r{border-color:var(--red);color:var(--red);}
+.pm-save{color:#2e7d32;font-size:10px;letter-spacing:.3px;}
+.pm-save.loss{color:var(--red);}
+
+.pm-close{display:block;width:100%;padding:14px;background:transparent;border:var(--border-ink);font-family:'ClevonStamp',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:none;transition:.12s;}
+.pm-close:hover{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+
+/* ABOUT */
+#about{background:var(--bg);}
+.ainn{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 3px 1fr;gap:0;}
+.acard{border:var(--border-ink);padding:32px;position:relative;margin-right:40px;overflow:hidden;}
+.acard::before{content:'PROFILE';position:absolute;top:16px;right:16px;font-size:7px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;}
+.avtr{width:56px;height:56px;background:var(--ink);display:flex;align-items:center;justify-content:center;font-family:'ClevonStamp',sans-serif;font-size:18px;color:var(--bg);margin-bottom:12px;letter-spacing:1px;}
+.an{font-family:'ClevonStamp',sans-serif;font-size:20px;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
+.ar{font-size:8px;color:var(--red);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;}
+.ab{font-size:11px;color:var(--muted);line-height:1.85;}
+.sgrd{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:16px;border:var(--border-ink);}
+.st{padding:12px;border-right:var(--border-ink);border-bottom:var(--border-ink);}
+.st:nth-child(2n){border-right:none;}.st:nth-child(n+3){border-bottom:none;}
+.sv{font-family:'ClevonStamp',sans-serif;font-size:22px;letter-spacing:1px;}
+.sl{font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.taglist{display:flex;flex-wrap:wrap;gap:0;margin-top:18px;}
+.tag{border:var(--border-ink);border-right:none;color:var(--ink);padding:4px 10px;font-size:9px;letter-spacing:.5px;transition:background .12s;cursor:default;}
+.tag:last-child{border-right:var(--border-ink);}
+.tag:hover{background:var(--ink);color:var(--bg);}
+
+/* WORK */
+#work{background:var(--light);}
+.whdr{max-width:1200px;margin:0 auto 32px;}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:0;max-width:1200px;margin:0 auto;border:var(--border-ink);}
+.wcard{overflow:hidden;cursor:pointer;border-right:var(--border-ink);}
+.wcard:hover .bprev{filter:grayscale(0%);}
+.bbar{display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--ink);border-bottom:var(--border-ink);}
+.bdots{display:flex;gap:5px;}.bd{width:8px;height:8px;border-radius:50%;}
+.bdr{background:#FF5F56;}.bdy{background:#FFBD2E;}.bdg{background:#27C93F;}
+.burl{flex:1;background:rgba(255,255,255,.08);padding:3px 10px;font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.5px;}
+.bprev{height:200px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;filter:grayscale(60%);transition:filter .3s;}
+.bvod{background:linear-gradient(135deg,#2d1000,#4a1a00);}
+.bhil{background:linear-gradient(135deg,#001428,#00203f);}
+.pvod{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%,rgba(204,0,0,.3) 0%,transparent 65%);}
+.phil{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%,rgba(204,0,0,.2) 0%,transparent 65%);}
+.pbody{position:relative;z-index:1;text-align:center;}
+.pem{font-size:40px;display:block;margin-bottom:6px;}
+.pn{font-family:'ClevonStamp',sans-serif;font-size:20px;color:#fff;letter-spacing:1px;text-transform:uppercase;}
+.ps{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:1px;margin-top:3px;}
+.winfo{padding:22px 24px;border-top:var(--border-ink);}
+.wbadge{display:inline-block;padding:2px 9px;font-size:7px;letter-spacing:2px;text-transform:uppercase;margin-bottom:9px;border:var(--border-ink);}
+.wlive{background:var(--red);border-color:var(--red);color:#fff;}
+.wwip{border-color:var(--muted);color:var(--muted);}
+.wtitle{font-family:'ClevonStamp',sans-serif;font-size:18px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;line-height:1.1;}
+.wdesc{color:var(--muted);font-size:11px;line-height:1.7;margin-bottom:14px;}
+.wlink{display:inline-flex;align-items:center;gap:5px;color:var(--ink);font-size:10px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;transition:gap .2s;border-bottom:1px solid var(--red);}
+.wlink:hover{gap:9px;}
+
+/* CONTACT */
+#contact{background:var(--bg);border-top:3px solid var(--ink);}
+.cwrap{max-width:800px;margin:0 auto;text-align:center;}
+.fpill{display:inline-flex;align-items:center;gap:8px;background:var(--red);color:#fff;padding:5px 16px;font-size:8px;letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;}
+.ctitle{font-family:'ClevonStamp',sans-serif;font-size:clamp(28px,6vw,72px);line-height:.88;letter-spacing:1px;color:var(--ink);margin-bottom:12px;}
+.ctitle em{font-family:'GhostinJingle',sans-serif;font-style:normal;color:var(--red);letter-spacing:2px;}
+.sdesc-w{color:var(--muted);font-size:11px;line-height:1.85;max-width:420px;margin:0 auto 10px;letter-spacing:.3px;}
+.epill{display:inline-flex;align-items:center;gap:10px;background:var(--ink);border:var(--border-ink);padding:14px 28px;font-size:12px;letter-spacing:.5px;color:var(--bg);text-decoration:none;margin:12px 0 16px;transition:background .12s;}
+.epill:hover{background:var(--red);}
+.cloc{font-size:9px;color:var(--muted);letter-spacing:1px;}
+
+footer{background:var(--ink);border-top:3px solid var(--ink);padding:24px 52px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.flogo{font-family:'ClevonStamp',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--bg);}
+.fc{color:var(--red);}
+.fcopy{font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.5px;}
+.flinks{display:flex;gap:0;}
+.flinks a{color:rgba(255,255,255,.4);text-decoration:none;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;transition:color .15s;padding:4px 16px;border-left:1px solid rgba(255,255,255,.1);}
+.flinks a:hover{color:var(--red);}
+#cd {
+}
+
+@media(max-width:960px){
+  #nav-toggle{display:flex;}.nav-links{display:none;}
+  .hero-right{display:none;}
+  #hero{grid-template-columns:1fr;}
+  .hero-left{display:block;}
+  .hero-col1{padding:80px 24px 40px;}
+  .edition-bar{padding:8px 24px;}
+  .col-rule{grid-template-columns:1fr;}
+  .col1{border-right:none;border-bottom:var(--border-ink);padding-right:0;padding-bottom:20px;margin-bottom:20px;}
+  .col2{padding-left:0;}
+  .sec{padding:60px 24px;}
+  .col-sep{display:none;}
+  .winn{grid-template-columns:1fr;}
+  .wleft{padding-right:0;border-bottom:var(--border-ink);padding-bottom:40px;margin-bottom:40px;}
+  .wright{padding-left:0;}
+  .ainn{grid-template-columns:1fr;}
+  .ainn > div.rv:first-child{border-bottom:var(--border-ink);padding-bottom:40px;margin-bottom:40px;}
+  .acard{margin-right:0;margin-bottom:28px;}
+  .wgrid{grid-template-columns:1fr;}
+  footer{flex-direction:column;text-align:center;}
+}
+
+/* ── SERVICES + STACK ── */
+#services.sec{padding:0;}
+#services .page{display:grid;grid-template-columns:1fr 1px 1fr;min-height:600px;}
+#services .divider{background:var(--ink);width:1px;}
+#services .left{padding:80px 52px;display:flex;flex-direction:column;gap:1.8rem;border-right:none;}
+#services .right{padding:80px 52px;display:flex;flex-direction:column;justify-content:space-between;}
+
+/* label — matches .slabel used across site */
+#services .section-label{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:10px;}
+#services .section-label::before{content:'§';color:var(--red);}
+
+/* headlines — ClevonStamp like every other section title */
+#services .intro-headline{font-family:'ClevonStamp',sans-serif;font-size:clamp(22px,4.5vw,52px);line-height:.9;letter-spacing:1px;text-transform:uppercase;color:var(--ink);}
+#services .intro-headline em{font-family:'GhostinJingle',sans-serif;color:var(--red);font-style:normal;text-transform:none;letter-spacing:2px;}
+#services .intro-sub{font-size:11px;color:var(--muted);line-height:1.85;letter-spacing:.3px;max-width:320px;}
+
+/* service rows */
+#services .services-list{display:flex;flex-direction:column;}
+#services .svc{display:grid;grid-template-columns:50px 1fr auto;align-items:start;gap:1rem;padding:1.1rem 0;border-bottom:var(--border);cursor:pointer;}
+#services .svc:hover .svc-num{color:var(--red);}
+#services .svc:hover .svc-arrow{opacity:1;transform:translateX(0);}
+#services .svc-num{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#bbb;padding-top:4px;transition:color 0.2s;}
+#services .svc-name{font-family:'ClevonStamp',sans-serif;font-size:clamp(13px,1.6vw,17px);letter-spacing:.5px;text-transform:uppercase;color:var(--ink);line-height:1.2;}
+#services .svc-copy{font-size:11px;color:var(--muted);line-height:1.85;letter-spacing:.3px;max-height:0;overflow:hidden;opacity:0;transition:max-height 0.35s ease,opacity 0.3s ease,margin 0.3s ease;}
+#services .svc.open .svc-copy{max-height:100px;opacity:1;margin-top:6px;}
+#services .svc-arrow{font-size:13px;color:var(--red);opacity:0;transform:translateX(-6px);transition:opacity 0.2s,transform 0.2s;padding-top:4px;user-select:none;}
+#services .svc.open .svc-arrow{opacity:1;transform:rotate(90deg) translateX(-2px);}
+
+/* stack / right panel */
+#services .stack-top{display:flex;flex-direction:column;gap:1.4rem;}
+#services .tags-wrap{display:flex;flex-wrap:wrap;gap:0;}
+#services .tag{font-size:9px;letter-spacing:.5px;text-transform:uppercase;color:var(--ink);border:var(--border-ink);border-right:none;padding:5px 13px;cursor:pointer;transition:background 0.12s,color 0.12s;font-weight:400;font-family:'ClevonStamp',monospace;}
+#services .tag:last-child{border-right:var(--border-ink);}
+#services .tag:hover{background:var(--ink);color:var(--bg);}
+#services .tag.active{background:var(--red);border-color:var(--red);color:#fff;}
+#services .stack-preview{margin-top:1.4rem;border:var(--border-ink);overflow:hidden;display:none;}
+#services .stack-preview.visible{display:block;}
+#services .preview-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:var(--border-ink);background:var(--light);}
+#services .preview-tech{font-family:'ClevonStamp',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--red);}
+#services .preview-use{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+#services .preview-desc{font-size:11px;color:var(--muted);line-height:1.85;letter-spacing:.3px;padding:10px 14px;border-bottom:var(--border);}
+#services .preview-demo{padding:14px;background:var(--bg);min-height:120px;font-size:12px;}
+#services .stack-bottom{border-top:3px double var(--ink);padding-top:1.8rem;margin-top:2rem;}
+#services .stack-headline{font-family:'ClevonStamp',sans-serif;font-size:clamp(22px,4.5vw,52px);line-height:.9;letter-spacing:1px;text-transform:uppercase;color:var(--ink);margin-bottom:0.75rem;}
+#services .stack-headline em{font-family:'GhostinJingle',sans-serif;color:var(--red);font-style:normal;text-transform:none;letter-spacing:2px;}
+#services .stack-body{font-size:11px;color:var(--muted);line-height:1.85;letter-spacing:.3px;}
+
+/* process steps */
+.proc-list{display:flex;flex-direction:column;gap:0;margin-top:24px;}
+.proc-item{display:grid;grid-template-columns:48px 1fr;gap:0;padding:16px 0;border-bottom:var(--border);align-items:start;}
+.proc-num{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);padding-top:3px;}
+.proc-title{font-family:'ClevonStamp',sans-serif;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--ink);margin-bottom:4px;}
+.proc-desc{font-size:11px;color:var(--muted);line-height:1.85;letter-spacing:.3px;}
+/* work editorial split */
+.work-split{display:grid;grid-template-columns:1fr 3px 1fr;gap:0;max-width:1200px;margin:0 auto;border:var(--border-ink);}
+.work-col{display:flex;flex-direction:column;overflow:hidden;}
+.work-col-hdr{padding:20px 28px;border-bottom:3px double var(--ink);display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
+.work-col-hdr .slabel{margin-bottom:0;}
+.work-split .col-sep{background:var(--ink);width:3px;}
+.wcard-inner{padding:0;}
+.wcard-inner .bbar{background:var(--ink);}
+.wcard-inner .winfo{padding:22px 28px;border-top:var(--border-ink);}
+.wcard-inner .bprev{height:220px;}
+.wcard-inner .burl{color:rgba(255,255,255,.5);}
+/* current project mockup */
+.bprev-mock{height:220px;background:var(--light);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-bottom:var(--border-ink);}
+.mock-inner{display:flex;flex-direction:column;gap:6px;width:70%;opacity:.7;}
+.mock-bar{height:6px;background:var(--ink);border-radius:1px;}
+.mock-bar.short{width:55%;}
+.mock-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px;}
+.mock-block{height:40px;background:var(--ink);opacity:.15;}
+.mock-label{position:absolute;bottom:12px;right:14px;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);border:var(--border);padding:3px 8px;}
+@media(max-width:960px){
+  .work-split{grid-template-columns:1fr;}
+  .work-col~.work-col{border-top:var(--border-ink);}
+}
+@media(max-width:960px){
+  #services .page{grid-template-columns:1fr;}
+  #services .divider{display:none;}
+  #services .left,#services .right{padding:60px 24px;}
+}
+</style>
+</head>
+<body>
+<div id="cd"></div><div id="cr"></div>
+
+<div id="mmenu">
+  <a href="#services" onclick="cm()">Services</a>
+  <a href="#why" onclick="cm()">Why Us</a>
+  <a href="#about" onclick="cm()">About</a>
+  <a href="#work" onclick="cm()">Work</a>
+  <a href="#contact" onclick="cm()">Free Consult</a>
+</div>
+
+<nav id="nav">
+  <div class="nav-top">
+    <a class="nav-logo" href="#">
+      <span class="nkm c">CTRL</span>+<span class="nkm">ALT</span>+<span>ORION</span>
+    </a>
+    <div class="nav-date">Portland, OR &mdash; Vol. I, Issue 1</div>
+    <ul class="nav-links">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#why">Why Us</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#contact" class="cta">Free Consult</a></li>
+    </ul>
+    <button id="nav-toggle" onclick="tm()"><span></span><span></span><span></span></button>
+  </div>
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="tick red">BREAKING:</span><span class="tick">Custom websites cost less than you think &mdash; and you own them forever</span>
+      <span class="tick red">//</span><span class="tick">Portland dev available for new projects &mdash; no templates, no subscriptions</span>
+      <span class="tick red">//</span><span class="tick">Shopify fees eating your margins? There's a better way</span>
+      <span class="tick red">//</span><span class="tick">BREAKING:</span><span class="tick">Custom websites cost less than you think &mdash; and you own them forever</span>
+      <span class="tick red">//</span><span class="tick">Portland dev available for new projects &mdash; no templates, no subscriptions</span>
+      <span class="tick red">//</span><span class="tick">Shopify fees eating your margins? There's a better way</span>
+    </div>
+  </div>
+</nav>
+
+<section id="hero">
+  <div class="hero-left">
+    <div class="edition-bar">
+      <span class="edition-l">Est. 2024 &mdash; Custom Web Development</span>
+      <span class="edition-r">Portland, Oregon &mdash; Worldwide</span>
+    </div>
+    <div class="hero-col1">
+      <div class="big-headline"><span class="hl-stamp">stop</span> <span class="hl-fancy">Renting.</span><br><span class="hl-fancy">Own</span> <span class="hl-stamp">it.</span></div>
+      <div class="hkeys">
+        <div class="key kc" id="kC" onclick="pk(this,event)">CTRL</div>
+        <span class="kplus">+</span>
+        <div class="key" id="kA" onclick="pk(this,event)">ALT</div>
+        <span class="kplus">+</span>
+        <div class="key" id="kO" onclick="pk(this,event)">ORION</div>
+      </div>
+      <div class="col-rule">
+        <div class="col1">
+          <div class="byline">By Mitchell Orion &mdash; Staff Developer</div>
+          <p class="coltext dropcap">No templates. No subscriptions. No middlemen. Custom sites &amp; apps built from scratch &mdash; you own it forever. Every line of code written by a single developer who answers your calls.</p>
+        </div>
+        <div class="col2">
+          <p class="coltext">Platforms like Shopify and Squarespace charge you monthly &mdash; forever &mdash; and take a cut of every sale. We build something you own outright. No recurring fees. No platform risk. Just your site, your way.</p>
+        </div>
+      </div>
+      <div class="hctas">
+        <a href="#contact" class="bp">Free Consult</a>
+        <a href="#work" class="bs">View Work &rarr;</a>
+      </div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="img-panel" id="imgPanel"></div>
+    <div class="photo-stamp">MITCHELL ORION</div>
+    <div class="img-caption">
+      <span>PORTLAND, OREGON &mdash; CTRL+ALT+ORION</span>
+      <span>FOUNDER &amp; DEVELOPER</span>
+    </div>
+  </div>
+</section>
+
+<div class="mwrap"><div class="mtrack">
+  <span class="mitem">Custom Design</span><span class="mitem">React &amp; Next.js</span><span class="mitem">Portland OR</span><span class="mitem">E-Commerce</span><span class="mitem">Full-Stack Dev</span><span class="mitem">Free Consultation</span><span class="mitem">Ditch Shopify</span><span class="mitem">Save Real Money</span><span class="mitem">Mobile-First</span><span class="mitem">SEO Optimized</span><span class="mitem">Custom Design</span><span class="mitem">React &amp; Next.js</span><span class="mitem">Portland OR</span><span class="mitem">E-Commerce</span><span class="mitem">Full-Stack Dev</span><span class="mitem">Free Consultation</span><span class="mitem">Ditch Shopify</span><span class="mitem">Save Real Money</span><span class="mitem">Mobile-First</span><span class="mitem">SEO Optimized</span>
+</div></div>
+
+<section id="services" class="sec">
+  <div class="page">
+
+    <!-- LEFT: SERVICES -->
+    <div class="left">
+      <div class="section-label">Services</div>
+      <div class="intro-headline">Everything<br><em>you need.</em></div>
+      <p class="intro-sub">From concept to launch — fast, beautiful, scalable work built for your business.</p>
+
+      <div class="services-list">
+        <div class="svc" onclick="toggleSvc(this)">
+          <div class="svc-num">01</div>
+          <div><div class="svc-name">Custom Websites</div><div class="svc-copy">Hand-coded, pixel-perfect. Not a template. Not a drag-and-drop. Yours — truly yours.</div></div>
+          <div class="svc-arrow">→</div>
+        </div>
+        <div class="svc" onclick="toggleSvc(this)">
+          <div class="svc-num">02</div>
+          <div><div class="svc-name">E-Commerce</div><div class="svc-copy">Ditch the Shopify fees. A faster store you actually own — lower costs, full control.</div></div>
+          <div class="svc-arrow">→</div>
+        </div>
+        <div class="svc" onclick="toggleSvc(this)">
+          <div class="svc-num">03</div>
+          <div><div class="svc-name">Web Applications</div><div class="svc-copy">Dashboards, booking systems, member portals. If you can dream it, we ship it.</div></div>
+          <div class="svc-arrow">→</div>
+        </div>
+        <div class="svc" onclick="toggleSvc(this)">
+          <div class="svc-num">04</div>
+          <div><div class="svc-name">Performance &amp; SEO</div><div class="svc-copy">Lightning-fast load times and solid SEO so you actually get found.</div></div>
+          <div class="svc-arrow">→</div>
+        </div>
+        <div class="svc" onclick="toggleSvc(this)">
+          <div class="svc-num">05</div>
+          <div><div class="svc-name">Platform Migrations</div><div class="svc-copy">Moving from Squarespace, Wix, GoDaddy, or Shopify? We handle the whole move.</div></div>
+          <div class="svc-arrow">→</div>
+        </div>
+        <div class="svc" onclick="toggleSvc(this)">
+          <div class="svc-num">06</div>
+          <div><div class="svc-name">Ongoing Support</div><div class="svc-copy">Updates, new features, maintenance — your long-term dev partner.</div></div>
+          <div class="svc-arrow">→</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- RIGHT: STACK -->
+    <div class="right">
+      <div class="stack-top">
+        <div class="section-label">Stack</div>
+        <div class="tags-wrap">
+          <span class="tag" onclick="showStack(this,'React')">React</span>
+          <span class="tag" onclick="showStack(this,'Next.js')">Next.js</span>
+          <span class="tag" onclick="showStack(this,'TypeScript')">TypeScript</span>
+          <span class="tag" onclick="showStack(this,'Node.js')">Node.js</span>
+          <span class="tag" onclick="showStack(this,'PostgreSQL')">PostgreSQL</span>
+          <span class="tag" onclick="showStack(this,'Tailwind')">Tailwind</span>
+          <span class="tag" onclick="showStack(this,'Stripe')">Stripe</span>
+          <span class="tag" onclick="showStack(this,'Vercel')">Vercel</span>
+          <span class="tag" onclick="showStack(this,'Figma')">Figma</span>
+          <span class="tag" onclick="showStack(this,'AWS')">AWS</span>
+        </div>
+
+        <div class="stack-preview" id="stack-preview">
+          <div class="preview-bar">
+            <span class="preview-tech" id="prev-tech"></span>
+            <span class="preview-use" id="prev-use"></span>
+          </div>
+          <div class="preview-desc" id="prev-desc"></div>
+          <div class="preview-demo" id="prev-demo"></div>
+        </div>
+      </div>
+
+      <div class="stack-bottom">
+        <div class="stack-headline">What I<br><em>build with.</em></div>
+        <p class="stack-body">I match the technology to your business, not the other way around. Most projects need less infrastructure than agencies would have you believe.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="why" class="sec">
+  <div class="winn">
+    <div class="wleft">
+      <div class="slabel rv">Analysis</div>
+      <h2 class="stitle rv d1">stop <em>renting</em><br><em><span class="strike">Shopify</span>.</em><br><em>own</em> it.</h2>
+      <div class="pull-quote rv d2">"Renting vs. buying. With us, you own the building."</div>
+      <p class="sdesc rv d3">Platforms lock you in, charge monthly, and take a cut of every sale. We build something you own outright &mdash; no platform risk, no recurring fees.</p>
+    </div>
+    <div class="col-sep"></div>
+    <div class="wright rv d1">
+      <div class="slabel">Pricing</div>
+      <div class="pricing-teaser">
+        <div class="pricing-row"><span class="pr-name">Shopify Basic</span><span class="pr-cost">$39<span style="font-family:'ClevonStamp',monospace;font-size:10px;color:var(--muted)">/mo + 2% fees</span></span></div>
+        <div class="pricing-row"><span class="pr-name">Wix Core</span><span class="pr-cost">$29<span style="font-family:'ClevonStamp',monospace;font-size:10px;color:var(--muted)">/mo</span></span></div>
+        <div class="pricing-row"><span class="pr-name">Squarespace Business</span><span class="pr-cost">$23<span style="font-family:'ClevonStamp',monospace;font-size:10px;color:var(--muted)">/mo</span></span></div>
+        <div class="pricing-row ours"><span class="pr-name">&#9733; Ctrl+Alt+Orion</span><span class="pr-cost">One-time. Yours.</span></div>
+      </div>
+      <button class="pricing-open-btn" onclick="document.getElementById('pricing-overlay').classList.add('open')">
+        <span>See full pricing breakdown</span><span>&rarr;</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="sec">
+  <div class="ainn">
+    <div class="rv">
+      <div class="slabel">Profile</div>
+      <h2 class="stitle d1">one <em>dev.</em><br>all <em>yours.</em></h2>
+      <p class="sdesc d2" style="margin-bottom:20px;">Solo studio. No account managers. No offshore outsourcing. You work directly with the person writing your code.</p>
+      <div class="acard">
+        <div class="avtr">MO</div>
+        <div class="an">Mitchell Orion</div>
+        <div class="ar">Founder &amp; Developer</div>
+        <p class="ab">Portland-based developer obsessed with fast, beautiful, custom web work. I believe every business deserves a site that actually represents them &mdash; not a template. When you hire me, you get me &mdash; not a handoff to a junior dev or an overseas team.</p>
+        <div class="sgrd">
+          <div class="st"><div class="sv">100%</div><div class="sl">Custom Code</div></div>
+          <div class="st"><div class="sv">$0</div><div class="sl">After Launch</div></div>
+          <div class="st"><div class="sv">PDX</div><div class="sl">Portland OR</div></div>
+          <div class="st"><div class="sv">1</div><div class="sl">Dev &mdash; Direct Line</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sep"></div>
+    <div class="rv d2" style="padding-left:40px;">
+      <div class="slabel">Process</div>
+      <h3 class="stitle d1" style="font-size:clamp(18px,3.5vw,38px);margin-bottom:6px;">how it<br><em>works.</em></h3>
+      <p class="sdesc" style="margin-bottom:0;">From first conversation to live site &mdash; here&rsquo;s exactly what working together looks like.</p>
+      <div class="proc-list">
+        <div class="proc-item">
+          <span class="proc-num">01</span>
+          <div><div class="proc-title">Free Consultation</div><div class="proc-desc">A real conversation about what you need. No pitch, no pressure &mdash; just clarity on scope, goals, and whether we&rsquo;re a good fit.</div></div>
+        </div>
+        <div class="proc-item">
+          <span class="proc-num">02</span>
+          <div><div class="proc-title">Proposal &amp; Flat Price</div><div class="proc-desc">Clear deliverables, one price, honest timeline. No hourly billing, no scope creep surprises. You know exactly what you&rsquo;re getting before anything starts.</div></div>
+        </div>
+        <div class="proc-item">
+          <span class="proc-num">03</span>
+          <div><div class="proc-title">Design in Figma</div><div class="proc-desc">Every project starts with a pixel-perfect design. You review and sign off on every screen before a single line of code is written.</div></div>
+        </div>
+        <div class="proc-item">
+          <span class="proc-num">04</span>
+          <div><div class="proc-title">Build &amp; Review</div><div class="proc-desc">You get access to the live build throughout. Regular check-ins, your feedback incorporated at every stage, full QA before launch.</div></div>
+        </div>
+        <div class="proc-item">
+          <span class="proc-num">05</span>
+          <div><div class="proc-title">Launch &amp; Handoff</div><div class="proc-desc">Your domain, your hosting, your code &mdash; everything transferred to you on day one. You own it outright. I&rsquo;m still here if you need me.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="work" class="sec">
+  <div class="whdr" style="max-width:1200px;margin:0 auto 32px;"><div class="slabel rv">Portfolio</div><h2 class="stitle rv d1">recent <em>builds.</em></h2></div>
+  <div class="work-split rv">
+
+    <!-- LEFT: most recent live build -->
+    <div class="work-col">
+      <div class="work-col-hdr">
+        <div class="slabel">Most Recent Build</div>
+        <span class="wbadge wlive">Live</span>
+      </div>
+      <div class="wcard-inner">
+        <div class="bbar">
+          <div class="bdots"><div class="bd bdr"></div><div class="bd bdy"></div><div class="bd bdg"></div></div>
+          <div class="burl">vodouizan.com</div>
+        </div>
+        <div class="bprev bvod" style="background:#000;padding:0;display:block;overflow:hidden;">
+          <iframe id="vod-iframe" src="https://vodouizan.com" title="vodouizan.com preview" scrolling="no" style="width:1280px;height:960px;border:none;display:block;pointer-events:none;" loading="lazy"></iframe>
+        </div>
+        <div class="winfo">
+          <div class="wtitle">Vodouizan</div>
+          <p class="wdesc">Custom site for a Haitian Vodou cultural platform — artist profiles, ceremony calendar, editorial content, and an online store. Built to honour the tradition with the craft it deserves.</p>
+          <a href="https://vodouizan.com" target="_blank" rel="noopener" class="wlink">Visit site &rarr;</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-sep"></div>
+
+    <!-- RIGHT: current in-progress project -->
+    <div class="work-col">
+      <div class="work-col-hdr">
+        <div class="slabel">Current Project</div>
+        <span class="wbadge wwip">In Progress</span>
+      </div>
+      <div class="wcard-inner">
+        <div class="bbar">
+          <div class="bdots"><div class="bd bdr"></div><div class="bd bdy"></div><div class="bd bdg"></div></div>
+          <div class="burl">hilley-sisters.com</div>
+        </div>
+        <div class="bprev-mock">
+          <div class="mock-inner">
+            <div class="mock-bar" style="width:40%;height:4px;opacity:.25;"></div>
+            <div class="mock-bar" style="width:75%;height:10px;"></div>
+            <div class="mock-bar short" style="height:8px;"></div>
+            <div class="mock-bar" style="width:88%;height:6px;opacity:.3;margin-top:4px;"></div>
+            <div class="mock-bar" style="width:70%;height:6px;opacity:.3;"></div>
+            <div class="mock-grid">
+              <div class="mock-block"></div>
+              <div class="mock-block"></div>
+            </div>
+          </div>
+          <div class="mock-label">Design in progress</div>
+        </div>
+        <div class="winfo">
+          <div class="wtitle">Hilley Sisters</div>
+          <p class="wdesc">Brand site for a creative duo &mdash; portfolio showcase, booking flow, and digital press kit. Launching soon.</p>
+          <span class="wlink" style="opacity:.4;cursor:default;border-color:var(--muted);">hilley-sisters.com &mdash; coming soon</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="contact" class="sec">
+  <div class="cwrap">
+    <div class="fpill rv">Open for Projects</div>
+    <h2 class="ctitle rv d1">let's <em>build</em><br>something <em>real.</em></h2>
+    <p class="sdesc-w rv d2">Free consultation. No pressure. Just a conversation about what you need and how we'd build it.</p>
+    <a href="mailto:mitchell@ctrlaltorion.com" class="epill rv d3">mitchell@ctrlaltorion.com</a>
+    <div class="cloc rv d3">Portland, OR &mdash; Available Worldwide</div>
+  </div>
+</section>
+
+<footer>
+  <div class="flogo"><span class="fc">Ctrl</span>+Alt+Orion</div>
+  <div class="fcopy">&copy; 2024 Ctrl+Alt+Orion. All rights reserved.</div>
+  <div class="flinks"><a href="#services">Services</a><a href="#work">Work</a><a href="#contact">Contact</a></div>
+</footer>
+
+<!-- PRICING OVERLAY -->
+<div id="pricing-overlay" onclick="pmOverlayClick(event)">
+  <div id="pricing-modal">
+    <div class="pm-head">
+      <div class="pm-title">pricing<br><em>breakdown.</em></div>
+      <p class="pm-sub">One-time build cost &mdash; no monthly fees, no surprises.</p>
+    </div>
+
+    <div class="pm-slider">
+      <label>Static pages</label>
+      <input type="range" min="1" max="20" value="5" step="1" id="pm-pages" oninput="pmUpdate()">
+      <span id="pm-pages-out">5 pages</span>
+    </div>
+
+    <div class="pm-price">
+      <div><div class="lbl">Your investment</div><div class="amt" id="pm-amt">$150</div></div>
+      <div class="note">one-time payment &middot; you own it</div>
+    </div>
+
+    <div class="pm-slabel">Add-ons (optional)</div>
+    <div class="pm-addons" id="pm-addons"></div>
+
+    <div class="pm-yr-row">
+      <button class="on" id="pmb-1" onclick="pmSetView(1)">1yr</button>
+      <button id="pmb-3" onclick="pmSetView(3)">3yr</button>
+      <button id="pmb-5" onclick="pmSetView(5)">5yr</button>
+      <button id="pmb-10" onclick="pmSetView(10)">10yr</button>
+      <button id="pmb-20" onclick="pmSetView(20)">20yr</button>
+    </div>
+    <p class="pm-yr-note" id="pm-yr-note">Comparing total cost of ownership over 1 year (build + subscriptions).</p>
+
+    <div class="pm-slabel">Cost comparison</div>
+    <table class="pm-table" id="pm-table"></table>
+
+    <button class="pm-close" onclick="document.getElementById('pricing-overlay').classList.remove('open')">Close</button>
+  </div>
+</div>
+
+<script>
+document.getElementById('imgPanel').style.backgroundImage="url('images/mitchell.png')";
+
+const ck={c:false,a:false};
+document.addEventListener('keydown',e=>{
+  if(e.code==='ControlLeft'||e.code==='ControlRight')ck.c=true;
+  if(e.code==='AltLeft'||e.code==='AltRight')ck.a=true;
+});
+document.addEventListener('keyup',e=>{
+  if(e.code==='ControlLeft'||e.code==='ControlRight')ck.c=false;
+  if(e.code==='AltLeft'||e.code==='AltRight')ck.a=false;
+});
+
+const cd=document.getElementById('cd'),cr=document.getElementById('cr');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cd.style.left=mx+'px';cd.style.top=my+'px';});
+(function loop(){rx+=(mx-rx)*.11;ry+=(my-ry)*.11;cr.style.left=rx+'px';cr.style.top=ry+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,.key,.wcard,.svc,#services .tag').forEach(el=>{el.addEventListener('mouseenter',()=>document.body.classList.add('ch'));el.addEventListener('mouseleave',()=>document.body.classList.remove('ch'));});
+
+function tm(){document.getElementById('mmenu').classList.toggle('open');}
+function cm(){document.getElementById('mmenu').classList.remove('open');}
+function pk(el,e){el.classList.add('pressed');setTimeout(()=>el.classList.remove('pressed'),180);}
+function toggleSvc(el){const isOpen=el.classList.contains('open');document.querySelectorAll('.svc').forEach(s=>s.classList.remove('open'));if(!isOpen)el.classList.add('open');}
+
+const STACK = {
+  'React': {
+    use: 'Interactive UIs & dashboards',
+    desc: 'React powers every dynamic interface I build — from booking flows to client portals.',
+    demo: `<div style="font-family:Inter,sans-serif;background:#f9f9f9;border:1px solid #eee;border-radius:4px;overflow:hidden">
+      <div style="background:#fff;border-bottom:1px solid #eee;padding:10px 14px;font-size:11px;color:#888;letter-spacing:0.1em;text-transform:uppercase">Booking widget</div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:6px">
+          ${['Mon','Tue','Wed','Thu','Fri'].map((d,i)=>`<div onclick="this.parentNode.querySelectorAll('div').forEach(x=>x.style.background='#f0f0f0');this.style.background='#CC0000';this.style.color='#fff'" style="flex:1;text-align:center;padding:6px 0;border:1px solid #ddd;font-size:10px;cursor:pointer;background:${i===1?'#CC0000':'#f0f0f0'};color:${i===1?'#fff':'#333'}">${d}</div>`).join('')}
+        </div>
+        <div style="display:flex;gap:6px">
+          ${['9am','11am','2pm','4pm'].map((t,i)=>`<div onclick="this.parentNode.querySelectorAll('div').forEach(x=>x.style.background='#f0f0f0');this.style.background='#111';this.style.color='#fff'" style="flex:1;text-align:center;padding:6px 0;border:1px solid #ddd;font-size:10px;cursor:pointer;background:${i===2?'#111':'#f0f0f0'};color:${i===2?'#fff':'#333'}">${t}</div>`).join('')}
+        </div>
+        <div style="background:#111;color:#fff;text-align:center;padding:8px;font-size:11px;letter-spacing:0.1em;cursor:pointer">CONFIRM</div>
+      </div>
+    </div>`
+  },
+  'Next.js': {
+    use: 'Fast marketing sites & SEO',
+    desc: 'Next.js means your site loads instantly and ranks — server-rendered pages, zero compromise on speed.',
+    demo: `<div style="font-family:Inter,sans-serif;background:#fff;border:1px solid #eee;border-radius:4px;overflow:hidden">
+      <div style="background:#111;padding:8px 14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="color:#fff;font-size:12px;font-weight:500">ACME CO.</span>
+        <span style="color:#CC0000;font-size:10px;letter-spacing:0.1em">MENU</span>
+      </div>
+      <div style="padding:18px 14px">
+        <div style="font-size:10px;color:#CC0000;letter-spacing:0.2em;margin-bottom:4px">LANDING PAGE</div>
+        <div style="font-size:18px;font-weight:700;color:#111;line-height:1.1;margin-bottom:8px">Built fast.<br>Found first.</div>
+        <div style="font-size:11px;color:#777;margin-bottom:12px">Server-rendered, SEO-ready, live in days.</div>
+        <div style="display:inline-block;background:#CC0000;color:#fff;padding:6px 16px;font-size:10px;letter-spacing:0.1em;cursor:pointer">GET STARTED</div>
+      </div>
+    </div>`
+  },
+  'TypeScript': {
+    use: 'Reliable, bug-resistant code',
+    desc: 'TypeScript catches errors before they reach production — every project is safer and easier to scale.',
+    demo: `<div style="font-family:'Courier New',monospace;background:#1a1a1a;border-radius:4px;padding:14px;font-size:11px;line-height:1.8">
+      <div style="color:#888;margin-bottom:4px">// Type-safe order interface</div>
+      <div><span style="color:#CC0000">interface</span> <span style="color:#e6c97a">Order</span> <span style="color:#fff">{</span></div>
+      <div style="padding-left:16px"><span style="color:#9cdcfe">id</span><span style="color:#fff">:</span> <span style="color:#4ec9b0">string</span><span style="color:#fff">;</span></div>
+      <div style="padding-left:16px"><span style="color:#9cdcfe">total</span><span style="color:#fff">:</span> <span style="color:#4ec9b0">number</span><span style="color:#fff">;</span></div>
+      <div style="padding-left:16px"><span style="color:#9cdcfe">status</span><span style="color:#fff">:</span> <span style="color:#ce9178">'pending'</span> <span style="color:#fff">|</span> <span style="color:#ce9178">'paid'</span> <span style="color:#fff">|</span> <span style="color:#ce9178">'shipped'</span><span style="color:#fff">;</span></div>
+      <div><span style="color:#fff">}</span></div>
+      <div style="margin-top:6px"><span style="color:#888">// TS catches mistakes instantly ↓</span></div>
+      <div><span style="color:#9cdcfe">order</span><span style="color:#fff">.</span><span style="color:#9cdcfe">status</span> <span style="color:#fff">=</span> <span style="color:#ce9178">'refunded'</span> <span style="color:#CC0000;text-decoration:underline wavy">// Error ✗</span></div>
+    </div>`
+  },
+  'Node.js': {
+    use: 'APIs, backends & automations',
+    desc: 'Node.js powers the server side — APIs, webhooks, automations, and anything that runs behind the scenes.',
+    demo: `<div style="font-family:'Courier New',monospace;background:#1a1a1a;border-radius:4px;padding:14px;font-size:11px;line-height:1.8">
+      <div style="color:#888">// Contact form API endpoint</div>
+      <div><span style="color:#CC0000">app</span><span style="color:#fff">.</span><span style="color:#dcdcaa">post</span><span style="color:#fff">(</span><span style="color:#ce9178">'/contact'</span><span style="color:#fff">, async (req, res) => {</span></div>
+      <div style="padding-left:16px"><span style="color:#c586c0">const</span> <span style="color:#9cdcfe">{ name, email, msg }</span> <span style="color:#fff">= req.body;</span></div>
+      <div style="padding-left:16px"><span style="color:#c586c0">await</span> <span style="color:#dcdcaa">sendEmail</span><span style="color:#fff">({ name, email, msg });</span></div>
+      <div style="padding-left:16px"><span style="color:#9cdcfe">res</span><span style="color:#fff">.</span><span style="color:#dcdcaa">json</span><span style="color:#fff">({</span> <span style="color:#9cdcfe">ok</span><span style="color:#fff">:</span> <span style="color:#569cd6">true</span> <span style="color:#fff">});</span></div>
+      <div><span style="color:#fff">});</span></div>
+    </div>`
+  },
+  'PostgreSQL': {
+    use: 'Structured data & user records',
+    desc: 'PostgreSQL stores everything reliably — user accounts, orders, content, inventory. Built to last.',
+    demo: `<div style="font-family:Inter,sans-serif;background:#f9f9f9;border:1px solid #eee;border-radius:4px;overflow:hidden">
+      <div style="background:#fff;border-bottom:1px solid #eee;padding:8px 14px;font-size:10px;color:#888;letter-spacing:0.1em;text-transform:uppercase">orders table</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead><tr style="background:#f0f0f0">${['id','customer','total','status'].map(h=>`<th style="text-align:left;padding:6px 10px;color:#555;font-weight:500;border-bottom:1px solid #ddd">${h}</th>`).join('')}</tr></thead>
+        <tbody>
+          ${[['#1041','Sara M.','€240','paid'],['#1042','João R.','€89','shipped'],['#1043','Ana T.','€430','pending']].map((r,i)=>`<tr style="background:${i%2?'#fafafa':'#fff'}">${r.map((c,j)=>`<td style="padding:6px 10px;border-bottom:1px solid #f0f0f0;color:${j===3?(c==='paid'?'#27ae60':c==='shipped'?'#2980b9':'#e67e22'):'#333'}">${c}</td>`).join('')}</tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`
+  },
+  'Tailwind': {
+    use: 'Clean, consistent UI styling',
+    desc: 'Tailwind keeps every component visually consistent — fast to build, easy to maintain, looks sharp.',
+    demo: `<div style="font-family:Inter,sans-serif;display:flex;flex-direction:column;gap:8px">
+      <div style="background:#fff;border:1px solid #eee;border-radius:6px;padding:12px;display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;background:#ffeaea;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;color:#CC0000;font-weight:700">S</div>
+        <div><div style="font-size:12px;font-weight:500;color:#111">Sara Mendes</div><div style="font-size:10px;color:#888">sara@email.com</div></div>
+        <div style="margin-left:auto;background:#f0faf4;color:#27ae60;font-size:9px;padding:3px 8px;border-radius:10px;letter-spacing:0.05em">Active</div>
+      </div>
+      <div style="background:#fff;border:1px solid #eee;border-radius:6px;padding:12px;display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;background:#eaf0ff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;color:#2980b9;font-weight:700">J</div>
+        <div><div style="font-size:12px;font-weight:500;color:#111">João Ramos</div><div style="font-size:10px;color:#888">joao@email.com</div></div>
+        <div style="margin-left:auto;background:#fff8e1;color:#e67e22;font-size:9px;padding:3px 8px;border-radius:10px;letter-spacing:0.05em">Pending</div>
+      </div>
+    </div>`
+  },
+  'Stripe': {
+    use: 'Payments & subscriptions',
+    desc: 'Stripe handles every payment scenario — one-off purchases, subscriptions, invoices, and refunds.',
+    demo: `<div style="font-family:Inter,sans-serif;background:#fff;border:1px solid #eee;border-radius:4px;overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:1px solid #eee">
+        <div style="font-size:10px;color:#888;margin-bottom:6px;letter-spacing:0.08em;text-transform:uppercase">Checkout</div>
+        <div style="font-size:16px;font-weight:600;color:#111">€149.00</div>
+        <div style="font-size:11px;color:#888">Pro Plan — monthly</div>
+      </div>
+      <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+        <div style="border:1px solid #ddd;padding:7px 10px;font-size:11px;color:#bbb;border-radius:3px">4242 4242 4242 4242</div>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;border:1px solid #ddd;padding:7px 10px;font-size:11px;color:#bbb;border-radius:3px">MM / YY</div>
+          <div style="flex:1;border:1px solid #ddd;padding:7px 10px;font-size:11px;color:#bbb;border-radius:3px">CVC</div>
+        </div>
+        <div style="background:#CC0000;color:#fff;text-align:center;padding:8px;font-size:11px;letter-spacing:0.08em;border-radius:3px;cursor:pointer">PAY €149.00</div>
+      </div>
+    </div>`
+  },
+  'Vercel': {
+    use: 'Deployment & global hosting',
+    desc: 'Vercel deploys every push automatically — your site is live worldwide in seconds, always up to date.',
+    demo: `<div style="font-family:Inter,sans-serif;background:#1a1a1a;border-radius:4px;padding:14px;font-size:11px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="width:8px;height:8px;border-radius:50%;background:#27ae60"></div>
+        <span style="color:#fff;font-weight:500">Production — Live</span>
+        <span style="color:#555;margin-left:auto">2s ago</span>
+      </div>
+      ${[['Building','done'],['Running tests','done'],['Deploying to edge','done'],['Global CDN propagation','done']].map(([s,st])=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #2a2a2a">
+        <span style="color:#27ae60;font-size:10px">✓</span>
+        <span style="color:#aaa">${s}</span>
+        <span style="color:#555;font-size:10px;margin-left:auto">${st}</span>
+      </div>`).join('')}
+      <div style="margin-top:10px;color:#CC0000;font-size:10px;letter-spacing:0.1em">yoursite.vercel.app ↗</div>
+    </div>`
+  },
+  'Figma': {
+    use: 'Design & prototyping',
+    desc: 'Every project starts in Figma — pixel-perfect designs reviewed and approved before a line of code is written.',
+    demo: `<div style="font-family:Inter,sans-serif;background:#f4f4f4;border-radius:4px;padding:12px;position:relative">
+      <div style="background:#fff;border:2px dashed #CC0000;border-radius:3px;padding:12px;margin-bottom:8px">
+        <div style="font-size:9px;color:#CC0000;letter-spacing:0.15em;margin-bottom:6px">HERO SECTION</div>
+        <div style="height:8px;background:#ddd;border-radius:2px;width:70%;margin-bottom:5px"></div>
+        <div style="height:6px;background:#eee;border-radius:2px;width:50%;margin-bottom:10px"></div>
+        <div style="display:inline-block;background:#111;height:18px;width:60px;border-radius:2px"></div>
+      </div>
+      <div style="background:#fff;border:1px solid #ddd;border-radius:3px;padding:10px;display:flex;gap:8px">
+        ${[1,2,3].map(()=>`<div style="flex:1;background:#f8f8f8;border-radius:3px;height:40px;border:1px solid #eee"></div>`).join('')}
+      </div>
+      <div style="position:absolute;top:8px;right:8px;background:#CC0000;color:#fff;font-size:9px;padding:3px 7px;border-radius:2px">Frame 1</div>
+    </div>`
+  },
+  'AWS': {
+    use: 'Storage, email & cloud infra',
+    desc: 'AWS handles file storage, transactional email, and any heavy-lifting infrastructure your project needs.',
+    demo: `<div style="font-family:Inter,sans-serif;background:#f9f9f9;border:1px solid #eee;border-radius:4px;overflow:hidden">
+      <div style="background:#fff;border-bottom:1px solid #eee;padding:8px 14px;font-size:10px;color:#888;letter-spacing:0.1em;text-transform:uppercase">S3 Bucket — uploads</div>
+      <div style="padding:10px 14px;display:flex;flex-direction:column;gap:6px">
+        ${[['profile-sara.jpg','Image','2.1 MB'],['invoice-1041.pdf','PDF','84 KB'],['banner-hero.webp','Image','310 KB']].map(([n,t,s])=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:#fff;border:1px solid #eee;border-radius:3px">
+          <div style="width:24px;height:24px;background:${t==='Image'?'#ffeaea':'#eaf0ff'};border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:${t==='Image'?'#CC0000':'#2980b9'}">${t==='Image'?'IMG':'PDF'}</div>
+          <span style="font-size:11px;color:#333;flex:1">${n}</span>
+          <span style="font-size:10px;color:#aaa">${s}</span>
+        </div>`).join('')}
+      </div>
+    </div>`
+  }
+};
+
+function showStack(el, tech) {
+  const isActive = el.classList.contains('active');
+  document.querySelectorAll('#services .tag').forEach(t => t.classList.remove('active'));
+  const preview = document.getElementById('stack-preview');
+  if (isActive) { preview.classList.remove('visible'); return; }
+  el.classList.add('active');
+  const d = STACK[tech];
+  document.getElementById('prev-tech').textContent = tech;
+  document.getElementById('prev-use').textContent = d.use;
+  document.getElementById('prev-desc').textContent = d.desc;
+  document.getElementById('prev-demo').innerHTML = d.demo;
+  preview.classList.add('visible');
+}
+
+const io=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});},{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+/* ── PRICING WIDGET ── */
+const PM_ADDONS=[
+  {id:'seo',name:'SEO optimization',price:75},
+  {id:'stripe',name:'Stripe payments',price:150},
+  {id:'inventory',name:'Inventory API',price:125},
+  {id:'accounts',name:'Account creation',price:100},
+  {id:'shipping',name:'Shipping integration',price:100},
+  {id:'sitemap',name:'Sitemap XML',price:50},
+  {id:'blog',name:'Blog / CMS',price:100},
+  {id:'contact',name:'Contact forms',price:50},
+  {id:'analytics',name:'Analytics setup',price:50},
+  {id:'gdpr',name:'GDPR / cookie consent',price:75},
+  {id:'emailblast',name:'Email blasting',price:125},
+  {id:'customemail',name:'Custom email setup',price:75}
+];
+const PM_COMPETITORS=[
+  {name:'Wix',monthly:17,label:'Light'},
+  {name:'Wix',monthly:29,label:'Core'},
+  {name:'Wix',monthly:36,label:'Business'},
+  {name:'Wix',monthly:159,label:'Business Elite'},
+  {name:'Squarespace',monthly:16,label:'Personal'},
+  {name:'Squarespace',monthly:23,label:'Basic Commerce'},
+  {name:'Squarespace',monthly:65,label:'Advanced Commerce'},
+  {name:'Shopify',monthly:39,label:'Basic'},
+  {name:'Shopify',monthly:105,label:'Shopify'},
+  {name:'Shopify',monthly:399,label:'Advanced'},
+  {name:'Shopify',monthly:2300,label:'Plus (est.)'}
+];
+let pmSel={},pmYrs=1;
+
+(function pmBuild(){
+  const g=document.getElementById('pm-addons');
+  g.innerHTML=PM_ADDONS.map(a=>
+    `<div class="pm-addon" id="pa-${a.id}" onclick="pmToggle('${a.id}')">
+      <div><div class="aname">${a.name}</div><div class="aprice">+$${a.price}</div></div>
+      <div class="pm-chk"></div>
+    </div>`
+  ).join('');
+  pmUpdate();
+})();
+
+function pmToggle(id){
+  pmSel[id]=!pmSel[id];
+  document.getElementById('pa-'+id).classList.toggle('on',pmSel[id]);
+  pmUpdate();
+}
+function pmBase(p){return p<=3?100:p<=8?150:200;}
+function pmAddonsTotal(){return PM_ADDONS.reduce((t,a)=>pmSel[a.id]?t+a.price:t,0);}
+function pmSetView(y){
+  pmYrs=y;
+  [1,3,5,10,20].forEach(n=>document.getElementById('pmb-'+n).classList.toggle('on',n===y));
+  document.getElementById('pm-yr-note').textContent=
+    'Comparing total cost of ownership over '+y+' year'+(y>1?'s':'')+' (build + subscriptions).';
+  pmUpdate();
+}
+function pmUpdate(){
+  const pages=parseInt(document.getElementById('pm-pages').value);
+  document.getElementById('pm-pages-out').textContent=pages+' page'+(pages>1?'s':'');
+  const myTotal=pmBase(pages)+pmAddonsTotal();
+  document.getElementById('pm-amt').textContent='$'+myTotal;
+  const yrs=pmYrs,groups={},order=[];
+  PM_COMPETITORS.forEach(c=>{
+    if(!groups[c.name]){groups[c.name]=[];order.push(c.name);}
+    const their=Math.round(c.monthly*12*yrs),diff=their-myTotal,pct=their>0?Math.round((diff/their)*100):0;
+    groups[c.name].push({c,their,diff,pct});
+  });
+  let body=`<tr class="you"><td>CtrlAltOrion <span class="ptag r">yours</span></td><td></td><td>$${myTotal}</td><td class="pm-save">one-time &middot; you own it</td></tr>`;
+  order.forEach(name=>{
+    body+=`<tr><td colspan="4" style="padding:1px 0;border-bottom:1px solid #CECECE"></td></tr>`;
+    groups[name].forEach((p,i)=>{
+      const cls=p.diff>=0?'pm-save':'pm-save loss';
+      const txt=p.diff>=0?`$${p.diff.toLocaleString()} more (${p.pct}%)`:`$${Math.abs(p.diff).toLocaleString()} less`;
+      body+=`<tr class="competitor">
+        <td style="color:${i===0?'var(--muted)':'#ccc'}">${i===0?name:''}</td>
+        <td><span class="ptag">${p.c.label}</span></td>
+        <td>$${p.their.toLocaleString()}</td>
+        <td class="${cls}">${txt}</td>
+      </tr>`;
+    });
+  });
+  document.getElementById('pm-table').innerHTML=
+    `<thead><tr><th>Provider</th><th>Plan</th><th>${yrs}yr total</th><th>vs my rate</th></tr></thead><tbody>${body}</tbody>`;
+}
+function pmOverlayClick(e){if(e.target===document.getElementById('pricing-overlay'))document.getElementById('pricing-overlay').classList.remove('open');}
+
+// extend cursor hover to pricing elements
+document.querySelectorAll('.pricing-open-btn,.pm-addon,.pm-yr-row button,.pm-close').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('ch'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('ch'));
+});
+// responsive vodouizan iframe preview
+(function(){
+  var iframe=document.getElementById("vod-iframe");
+  if(!iframe)return;
+  function scale(){
+    var w=iframe.closest(".bprev").offsetWidth;
+    iframe.style.zoom=w/1280;
+  }
+  scale();
+  window.addEventListener("resize",scale);
+})();
+</script>
+</body>
+</html>
