@@ -5,7 +5,9 @@
       "Read(//c/Users/Mitchell/Downloads/**)",
       "Bash(unzip -j \"railway-gank-street-marker-font-2026-04-07-06-01-49-utc.zip\" \"*.ttf\" -d /c/Users/Mitchell/ctrlaltorion/fonts/)",
       "Bash(unzip -j \"relaxe-typeface-2026-04-07-06-21-14-utc.zip\" \"Web-TT/Relaxe.woff2\" \"Web-TT/Relaxe.woff\" \"Web-TT/Relaxe.ttf\" -d /c/Users/Mitchell/ctrlaltorion/fonts/)",
-      "Bash(unzip -j \"technul-regular-soft-2026-04-07-06-18-52-utc.zip\" \"*.ttf\" -d /c/Users/Mitchell/ctrlaltorion/fonts/)"
+      "Bash(unzip -j \"technul-regular-soft-2026-04-07-06-18-52-utc.zip\" \"*.ttf\" -d /c/Users/Mitchell/ctrlaltorion/fonts/)",
+      "mcp__9a9c4d80-e78c-441c-8be3-45f6b530032a__netlify-project-services-reader",
+      "mcp__9a9c4d80-e78c-441c-8be3-45f6b530032a__netlify-deploy-services-reader"
     ]
   }
 }
