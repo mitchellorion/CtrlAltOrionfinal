@@ -136,11 +136,11 @@ body.ch #cd{background:var(--red);}
 
 
 /* shared column separator */
-.col-sep{background:var(--ink);width:3px;align-self:stretch;}
+.col-sep{background:var(--ink);width:1px;align-self:stretch;}
 
 /* WHY — two-column editorial */
 #why{background:var(--light);}
-.winn{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 3px 1fr;gap:0;}
+.winn{display:grid;grid-template-columns:1fr 1px 1fr;gap:0;}
 .wleft{padding-right:40px;}
 .wright{padding-left:40px;}
 .pull-quote{border-left:4px solid var(--red);padding:14px 20px;margin:20px 0;font-family:'ClevonStamp',sans-serif;font-size:18px;line-height:1.15;text-transform:uppercase;letter-spacing:.5px;}
@@ -235,7 +235,7 @@ body.ch #cd{background:var(--red);}
 
 /* ABOUT */
 #about{background:var(--bg);}
-.ainn{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 3px 1fr;gap:0;}
+.ainn{display:grid;grid-template-columns:1fr 1px 1fr;gap:0;}
 .acard{border:var(--border-ink);padding:32px;position:relative;margin-right:40px;overflow:hidden;}
 .acard::before{content:'PROFILE';position:absolute;top:16px;right:16px;font-size:7px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;}
 .avtr{width:56px;height:56px;background:var(--ink);display:flex;align-items:center;justify-content:center;font-family:'ClevonStamp',sans-serif;font-size:18px;color:var(--bg);margin-bottom:12px;letter-spacing:1px;}
@@ -254,7 +254,7 @@ body.ch #cd{background:var(--red);}
 
 /* WORK */
 #work{background:var(--light);}
-.whdr{max-width:1200px;margin:0 auto 32px;}
+.whdr{margin-bottom:32px;}
 .wgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:0;max-width:1200px;margin:0 auto;border:var(--border-ink);}
 .wcard{overflow:hidden;cursor:pointer;border-right:var(--border-ink);}
 .wcard:hover .bprev{filter:grayscale(0%);}
@@ -377,11 +377,11 @@ footer{background:var(--ink);border-top:3px solid var(--ink);padding:24px 52px;d
 .proc-title{font-family:'ClevonStamp',sans-serif;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--ink);margin-bottom:4px;}
 .proc-desc{font-size:11px;color:var(--muted);line-height:1.85;letter-spacing:.3px;}
 /* work editorial split */
-.work-split{display:grid;grid-template-columns:1fr 3px 1fr;gap:0;max-width:1200px;margin:0 auto;border:var(--border-ink);}
-.work-col{display:flex;flex-direction:column;overflow:hidden;}
+.work-split{display:grid;grid-template-columns:1fr 52px 1fr;gap:0;}
+.work-col{display:flex;flex-direction:column;overflow:hidden;border:var(--border-ink);}
 .work-col-hdr{padding:20px 28px;border-bottom:3px double var(--ink);display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
 .work-col-hdr .slabel{margin-bottom:0;}
-.work-split .col-sep{background:var(--ink);width:3px;}
+.work-split .col-sep{background:transparent;width:52px;}
 .wcard-inner{padding:0;}
 .wcard-inner .bbar{background:var(--ink);}
 .wcard-inner .winfo{padding:22px 28px;border-top:var(--border-ink);}
@@ -644,7 +644,7 @@ footer{background:var(--ink);border-top:3px solid var(--ink);padding:24px 52px;d
 </section>
 
 <section id="work" class="sec">
-  <div class="whdr" style="max-width:1200px;margin:0 auto 32px;"><div class="slabel rv">Portfolio</div><h2 class="stitle rv d1">recent <em>builds.</em></h2></div>
+  <div class="whdr"><div class="slabel rv">Portfolio</div><h2 class="stitle rv d1">recent <em>builds.</em></h2></div>
   <div class="work-split rv">
 
     <!-- LEFT: most recent live build -->
@@ -958,6 +958,10 @@ function showStack(el, tech) {
 
 const io=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});},{threshold:.12});
 document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+/* auto-select React on load */
+const reactTag = document.querySelector('#services .tag');
+if (reactTag) showStack(reactTag, 'React');
 
 /* ── PRICING WIDGET ── */
 const PM_ADDONS=[
