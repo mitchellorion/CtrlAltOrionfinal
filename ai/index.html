@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>What's Next — Ctrl+Alt+Orion</title>
+<style>
+@import url("../webfonts/Relaxe/stylesheet.css");
+@import url("../webfonts/Helvena_Black/stylesheet.css");
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;500&display=swap');
+
+@font-face{font-family:Relaxe;src:url('../fonts/RailwayGank.ttf')format('truetype');}
+@font-face{font-family:'GhostinJingle';src:url('../fonts/GhostinJingle.ttf') format('truetype');}
+@font-face{font-family:'ClevonStamp';src:url('../fonts/ClevonStamp.ttf') format('truetype');}
+@font-face{font-family:"Helvena Black";font-style:normal;font-variant:normal;font-weight:300;line-height:0pc;}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#FAFAF8;--ink:#080808;--red:#CC0000;--muted:#555;--light:#ECECEA;
+  --border:1px solid #CECECE;--border-ink:1px solid #080808;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:'ClevonStamp',monospace;overflow-x:hidden;cursor:none;}
+
+/* CURSOR */
+#cd{width:10px;height:10px;background:var(--ink);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);}
+#cr{width:36px;height:36px;border:var(--border-ink);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .15s,height .15s;}
+body.ch #cr{width:52px;height:52px;border-color:var(--red);}
+body.ch #cd{background:var(--red);}
+
+@keyframes fu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes mq{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes tickertape{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes pulse-ring{0%{transform:translate(-50%,-50%) scale(.85);opacity:.6}70%{transform:translate(-50%,-50%) scale(1.4);opacity:0}100%{transform:translate(-50%,-50%) scale(1.4);opacity:0}}
+@keyframes reveal-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* AI BAR */
+.ai-bar{display:flex;align-items:center;justify-content:center;gap:16px;height:34px;background:var(--ink);border-bottom:1px solid #2a2a2a;font-family:'ClevonStamp',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;overflow:hidden;position:relative;}
+.ai-bar::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 80px,rgba(255,255,255,.015) 80px,rgba(255,255,255,.015) 81px);pointer-events:none;}
+.ai-bar-badge{background:var(--red);color:#fff;padding:3px 9px;font-size:7px;letter-spacing:3px;font-family:'ClevonStamp',monospace;flex-shrink:0;}
+.ai-bar-text{color:rgba(255,255,255,.65);letter-spacing:2.5px;font-size:8px;}
+.ai-bar-text strong{color:rgba(255,255,255,.92);font-weight:normal;}
+.ai-bar-cta{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.85);padding:3px 12px;font-size:7px;letter-spacing:2px;text-decoration:none;text-transform:uppercase;font-family:'ClevonStamp',monospace;flex-shrink:0;transition:background .12s,border-color .12s,color .12s;}
+.ai-bar-cta:hover{background:var(--red);border-color:var(--red);color:#fff;}
+.ai-bar-divider{color:rgba(255,255,255,.2);font-size:10px;}
+.ai-dot{width:6px;height:6px;background:var(--red);border-radius:50%;flex-shrink:0;animation:blink 1.4s ease-in-out infinite;}
+
+/* NAV */
+#nav{position:fixed;inset:0 0 auto 0;z-index:200;background:var(--bg);border-bottom:3px solid var(--ink);}
+.nav-top{display:flex;align-items:stretch;height:56px;}
+.nav-logo{font-family:'ClevonStamp',sans-serif;font-size:13px;letter-spacing:1px;text-decoration:none;color:var(--ink);display:flex;align-items:center;padding:0 28px;border-right:var(--border-ink);text-transform:uppercase;gap:6px;}
+.nkm{display:inline-flex;align-items:center;justify-content:center;background:var(--ink);padding:3px 8px;font-size:9px;letter-spacing:1px;color:var(--bg);}
+.nkm.c{background:var(--red);color:#fff;}
+.nav-date{display:flex;align-items:center;padding:0 20px;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;border-right:var(--border);}
+.nav-links{display:flex;align-items:stretch;list-style:none;margin-left:auto;}
+.nav-links li{border-left:var(--border);}
+.nav-links a{display:flex;align-items:center;padding:0 20px;font-size:9px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;color:var(--ink);transition:background .12s,color .12s;}
+.nav-links a:hover{background:var(--ink);color:var(--bg);}
+.nav-links a.cta{background:var(--red);color:#fff;}
+.nav-links a.cta:hover{background:var(--ink);}
+.nav-links a.ai-link{color:var(--bg);background:var(--ink);letter-spacing:2px;gap:7px;}
+.nav-links a.ai-link::before{content:'';display:inline-block;width:5px;height:5px;background:var(--red);border-radius:50%;flex-shrink:0;animation:blink 1.4s ease-in-out infinite;}
+.nav-links a.ai-link:hover{background:var(--red);}
+.nav-links li.ai-li{border-left:var(--border-ink);}
+.ticker{background:var(--ink);color:var(--bg);overflow:hidden;height:28px;display:flex;align-items:center;font-size:8px;letter-spacing:2px;text-transform:uppercase;}
+.ticker-inner{display:flex;white-space:nowrap;width:max-content;animation:tickertape 24s linear infinite;}
+.tick{padding:0 32px;color:rgba(255,255,255,.7);}
+.tick.red{color:var(--red);font-weight:bold;}
+#nav-toggle{display:none;align-items:center;justify-content:center;background:none;border:none;border-left:var(--border);cursor:none;padding:0 20px;margin-left:auto;}
+#nav-toggle span{display:block;width:18px;height:1.5px;background:var(--ink);margin:4.5px 0;}
+#mmenu{display:none;position:fixed;inset:0;z-index:190;background:var(--bg);flex-direction:column;align-items:flex-start;justify-content:center;gap:0;border-right:var(--border-ink);}
+#mmenu.open{display:flex;}
+#mmenu a{font-family:'ClevonStamp',sans-serif;font-size:clamp(28px,6vw,56px);color:var(--ink);text-decoration:none;letter-spacing:2px;text-transform:uppercase;padding:16px 52px;border-bottom:var(--border-ink);width:100%;transition:background .12s;}
+#mmenu a:first-child{border-top:var(--border-ink);}
+#mmenu a:hover{background:var(--light);}
+
+/* HERO */
+.ai-hero{padding-top:118px;min-height:100vh;display:grid;grid-template-columns:1fr 38%;border-bottom:var(--border-ink);}
+.ai-hero-left{border-right:var(--border-ink);display:flex;flex-direction:column;}
+.ai-hero-edition{display:flex;align-items:center;justify-content:space-between;padding:10px 52px;border-bottom:3px double var(--ink);}
+.ai-hero-edition span{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.ai-hero-body{padding:48px 52px;flex:1;display:flex;flex-direction:column;justify-content:center;}
+.ai-kicker{display:inline-flex;align-items:center;gap:10px;margin-bottom:18px;}
+.ai-kicker-badge{background:var(--red);color:#fff;padding:3px 10px;font-size:7px;letter-spacing:4px;text-transform:uppercase;}
+.ai-kicker-label{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.ai-headline{font-size:clamp(32px,5.5vw,80px);line-height:1.0;letter-spacing:3px;color:var(--ink);margin-bottom:20px;animation:fu .5s ease both;}
+.ai-headline .fancy{font-family:'GhostinJingle',sans-serif;color:var(--red);letter-spacing:4px;}
+.ai-headline .stamp{font-family:'ClevonStamp',sans-serif;}
+.ai-rule{border-top:3px double var(--ink);margin:24px 0;}
+.ai-lede{font-size:11.5px;line-height:1.9;color:var(--ink);max-width:560px;margin-bottom:28px;}
+.ai-lede strong{font-weight:normal;border-bottom:2px solid var(--ink);}
+.ai-ctas{display:flex;gap:0;margin-top:4px;}
+.ai-btn-p{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--bg);text-decoration:none;padding:14px 30px;font-family:'ClevonStamp',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;border:var(--border-ink);transition:background .12s;}
+.ai-btn-p:hover{background:var(--red);}
+.ai-btn-s{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--ink);text-decoration:none;padding:14px 30px;font-family:'ClevonStamp',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;border:var(--border-ink);border-left:none;transition:background .12s;}
+.ai-btn-s:hover{background:var(--light);}
+
+/* RIGHT PANEL — schematic */
+.ai-hero-right{background:var(--ink);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:52px 44px;}
+.ai-hero-right::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.06) 1px,transparent 1px);background-size:18px 18px;pointer-events:none;}
+.ai-schematic{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:center;gap:0;}
+.schema-title{font-size:7px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:28px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;}
+.schema-node{display:flex;align-items:flex-start;gap:16px;padding:18px 0;border-bottom:1px solid rgba(255,255,255,.07);position:relative;}
+.schema-node:last-child{border-bottom:none;}
+.snode-num{font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.25);padding-top:2px;flex-shrink:0;width:20px;}
+.snode-content{flex:1;}
+.snode-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:5px;}
+.snode-desc{font-size:10px;letter-spacing:.5px;color:rgba(255,255,255,.6);line-height:1.7;}
+.snode-tag{display:inline-block;border:1px solid rgba(255,255,255,.12);padding:2px 8px;font-size:6px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:8px;}
+.snode-tag.live{border-color:rgba(204,0,0,.5);color:var(--red);}
+.schema-foot{font-size:7px;letter-spacing:2px;color:rgba(255,255,255,.2);text-transform:uppercase;z-index:2;border-top:1px solid rgba(255,255,255,.06);padding-top:16px;margin-top:8px;}
+
+/* SECTION BASE */
+.sec{padding:80px 52px;border-top:var(--border-ink);}
+.slabel{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.slabel::before{content:'§';color:var(--red);}
+.stitle{font-family:'ClevonStamp',sans-serif;font-size:clamp(22px,4vw,50px);line-height:.95;letter-spacing:1px;margin-bottom:16px;}
+.stitle em{font-family:'GhostinJingle',sans-serif;color:var(--red);font-style:normal;letter-spacing:2px;}
+.sdesc{color:var(--muted);font-size:11px;line-height:1.85;max-width:560px;}
+.rv{opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s;}
+.rv.vis{opacity:1;transform:none;}
+.d1{transition-delay:.1s;}.d2{transition-delay:.2s;}.d3{transition-delay:.3s;}.d4{transition-delay:.4s;}
+.column-rule{width:100%;border-top:3px double var(--ink);margin:12px 0;}
+
+/* WEDGE SECTION */
+#wedge{padding:0;border-top:var(--border-ink);}
+#wedge .inner{display:grid;grid-template-columns:1fr 1px 1fr;min-height:540px;}
+#wedge .divider{background:var(--ink);}
+#wedge .left{padding:72px 52px;display:flex;flex-direction:column;justify-content:space-between;}
+#wedge .right{padding:72px 52px;background:var(--light);}
+.pain-list{list-style:none;margin-top:24px;display:flex;flex-direction:column;gap:0;}
+.pain-list li{font-size:10px;letter-spacing:.5px;line-height:1.7;padding:14px 0;border-bottom:var(--border);display:flex;align-items:flex-start;gap:14px;color:var(--ink);}
+.pain-list li:first-child{border-top:var(--border);}
+.pain-num{font-size:8px;letter-spacing:2px;color:var(--red);flex-shrink:0;padding-top:2px;}
+.pain-glyph{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.solution-box{background:var(--ink);color:var(--bg);padding:28px 32px;margin-top:28px;}
+.solution-box .sol-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:10px;}
+.solution-box p{font-size:11px;line-height:1.85;color:rgba(255,255,255,.75);}
+
+/* MODULES GRID */
+#modules .mgrid{display:grid;grid-template-columns:repeat(4,1fr);border-top:var(--border-ink);margin-top:48px;}
+.mcard{border-right:var(--border-ink);padding:36px 32px;position:relative;}
+.mcard:last-child{border-right:none;}
+.mcard-num{font-size:8px;letter-spacing:3px;color:var(--muted);margin-bottom:20px;}
+.mcard-icon{font-size:28px;margin-bottom:16px;line-height:1;}
+.mcard-title{font-family:'ClevonStamp',sans-serif;font-size:15px;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;color:var(--ink);}
+.mcard-desc{font-size:10px;letter-spacing:.3px;line-height:1.8;color:var(--muted);}
+.mcard-tag{position:absolute;top:16px;right:16px;font-size:6px;letter-spacing:2.5px;text-transform:uppercase;padding:3px 8px;border:var(--border);}
+.mcard-tag.wedge{border-color:var(--red);color:var(--red);}
+.mcard-tag.next{border-color:var(--muted);color:var(--muted);}
+
+/* DATA LOOP */
+#loop .loop-diagram{display:grid;grid-template-columns:repeat(5,1fr) auto;align-items:center;margin-top:48px;border:var(--border-ink);background:var(--bg);}
+.loop-step{padding:32px 24px;border-right:var(--border-ink);position:relative;}
+.loop-step:last-child{border-right:none;}
+.loop-arrow{display:flex;align-items:center;justify-content:center;padding:0 8px;font-size:16px;color:var(--muted);border-right:var(--border-ink);}
+.ls-num{font-size:7px;letter-spacing:3px;color:var(--muted);margin-bottom:10px;}
+.ls-name{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);margin-bottom:6px;}
+.ls-sub{font-size:9px;letter-spacing:.5px;color:var(--muted);line-height:1.6;}
+.ls-active .ls-name{color:var(--red);}
+.ls-active{background:rgba(204,0,0,.03);}
+
+/* FOUNDER NOTE */
+#founder{border-top:var(--border-ink);display:grid;grid-template-columns:1px 1fr 1px;}
+#founder .border-l,#founder .border-r{background:var(--ink);}
+#founder .inner{padding:72px 72px;}
+.founder-kicker{font-size:7px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.founder-kicker::before{content:'';display:inline-block;width:24px;height:1px;background:var(--red);}
+.founder-quote{font-family:'GhostinJingle',sans-serif;font-size:clamp(20px,3.5vw,44px);line-height:1.2;letter-spacing:2px;color:var(--ink);margin-bottom:28px;}
+.founder-quote em{font-style:normal;color:var(--red);}
+.founder-body{font-size:11px;line-height:1.9;color:var(--muted);max-width:620px;columns:2;column-gap:40px;column-rule:var(--border);}
+.founder-sig{margin-top:32px;display:flex;align-items:center;gap:16px;}
+.founder-sig-name{font-size:9px;letter-spacing:2px;text-transform:uppercase;}
+.founder-sig-title{font-size:8px;letter-spacing:1px;color:var(--muted);}
+
+/* EARLY ACCESS CTA */
+#early{border-top:3px solid var(--ink);background:var(--ink);padding:80px 52px;}
+.early-inner{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:start;border-top:1px solid rgba(255,255,255,.08);padding-top:48px;}
+.early-left .etitle{font-family:'ClevonStamp',sans-serif;font-size:clamp(24px,4vw,52px);line-height:.95;letter-spacing:2px;color:var(--bg);margin-bottom:16px;}
+.early-left .etitle em{font-family:'GhostinJingle',sans-serif;color:var(--red);font-style:normal;}
+.early-left .edesc{font-size:11px;line-height:1.85;color:rgba(255,255,255,.5);max-width:480px;}
+.early-right{padding-left:52px;border-left:1px solid rgba(255,255,255,.1);}
+.early-form{display:flex;flex-direction:column;gap:0;}
+.ef-row{display:flex;flex-direction:column;gap:0;border-bottom:1px solid rgba(255,255,255,.1);}
+.ef-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.3);padding:14px 0 4px;}
+.ef-input{background:transparent;border:none;outline:none;color:var(--bg);font-family:'ClevonStamp',monospace;font-size:12px;letter-spacing:.5px;padding:4px 0 14px;width:100%;}
+.ef-input::placeholder{color:rgba(255,255,255,.18);}
+.ef-submit{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--red);color:#fff;border:none;padding:16px 36px;font-family:'ClevonStamp',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:none;margin-top:28px;width:100%;transition:background .12s;}
+.ef-submit:hover{background:#a80000;}
+.ef-note{font-size:8px;letter-spacing:1px;color:rgba(255,255,255,.2);margin-top:12px;text-align:center;}
+.early-label{font-size:7px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:20px;}
+
+/* FOOTER */
+footer{background:var(--ink);color:var(--bg);padding:28px 52px;display:flex;align-items:center;justify-content:space-between;border-top:var(--border-ink);}
+.flogo{font-family:'ClevonStamp',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--bg);}
+.fc{color:var(--red);}
+.fcopy{font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.5px;}
+.flinks a{color:rgba(255,255,255,.4);text-decoration:none;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;transition:color .15s;padding:4px 16px;border-left:1px solid rgba(255,255,255,.1);}
+.flinks a:hover{color:var(--red);}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  #nav-toggle{display:flex;}.nav-links{display:none;}
+  .ai-hero{grid-template-columns:1fr;padding-top:118px;}
+  .ai-hero-right{display:none;}
+  .ai-hero-body{padding:48px 24px;}
+  .ai-hero-edition{padding:10px 24px;}
+  .sec{padding:60px 24px;}
+  #wedge .inner{grid-template-columns:1fr;}
+  #wedge .divider{display:none;}
+  #wedge .left,#wedge .right{padding:52px 24px;}
+  #modules .mgrid{grid-template-columns:1fr 1fr;}
+  .mcard:nth-child(2){border-right:none;}
+  .mcard:nth-child(3){border-top:var(--border-ink);border-right:var(--border-ink);}
+  .mcard:nth-child(4){border-top:var(--border-ink);border-right:none;}
+  #loop .loop-diagram{grid-template-columns:1fr 1fr;}
+  .loop-arrow{display:none;}
+  .loop-step{border-bottom:var(--border-ink);}
+  #founder .inner{padding:52px 24px;}
+  .founder-body{columns:1;}
+  .early-inner{grid-template-columns:1fr;}
+  .early-right{padding-left:0;border-left:none;border-top:1px solid rgba(255,255,255,.1);padding-top:40px;margin-top:40px;}
+  footer{flex-direction:column;gap:16px;text-align:center;}
+  .ai-bar-text{display:none;}
+  .ai-bar-divider{display:none;}
+}
+</style>
+</head>
+<body>
+<div id="cd"></div><div id="cr"></div>
+
+<div id="mmenu">
+  <a href="/" onclick="cm()">Home</a>
+  <a href="/#services" onclick="cm()">Services</a>
+  <a href="/#about" onclick="cm()">About</a>
+  <a href="/#work" onclick="cm()">Work</a>
+  <a href="/#contact" onclick="cm()">Free Consult</a>
+  <a href="/ai" onclick="cm()" style="color:var(--red);display:flex;align-items:center;gap:12px;">
+    <span style="width:7px;height:7px;background:var(--red);border-radius:50%;flex-shrink:0;display:inline-block;animation:blink 1.4s ease-in-out infinite;"></span>What's Next?
+  </a>
+</div>
+
+<nav id="nav">
+  <div class="ai-bar">
+    <div class="ai-dot"></div>
+    <span class="ai-bar-badge">AI</span>
+    <span class="ai-bar-text"><strong>Now Building:</strong> AI-Native Ops Platform for Restaurants &amp; Bars</span>
+    <span class="ai-bar-divider">&mdash;</span>
+    <a href="/ai" class="ai-bar-cta">Early Access &rsaquo;</a>
+  </div>
+  <div class="nav-top">
+    <a class="nav-logo" href="/">
+      <span class="nkm c">CTRL</span>+<span class="nkm">ALT</span>+<span>ORION</span>
+    </a>
+    <div class="nav-date">Portland, OR &mdash; Vol. I, Issue 1</div>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/#services">Services</a></li>
+      <li><a href="/#about">About</a></li>
+      <li><a href="/#contact" class="cta">Free Consult</a></li>
+      <li class="ai-li"><a href="/ai" class="ai-link">What's Next?</a></li>
+    </ul>
+    <button id="nav-toggle" onclick="tm()"><span></span><span></span><span></span></button>
+  </div>
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="tick red">COMING SOON:</span><span class="tick">AI-native tip-out automation for the restaurant industry &mdash; built by someone who worked the floor</span>
+      <span class="tick red">//</span><span class="tick">Plain-English policy configuration &mdash; no more Saturday-night spreadsheets</span>
+      <span class="tick red">//</span><span class="tick">Predictive shift earnings &mdash; servers know their expected take-home before they pick up a shift</span>
+      <span class="tick red">//</span><span class="tick">COMING SOON:</span><span class="tick">AI-native tip-out automation for the restaurant industry &mdash; built by someone who worked the floor</span>
+      <span class="tick red">//</span><span class="tick">Plain-English policy configuration &mdash; no more Saturday-night spreadsheets</span>
+      <span class="tick red">//</span><span class="tick">Predictive shift earnings &mdash; servers know their expected take-home before they pick up a shift</span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="ai-hero">
+  <div class="ai-hero-left">
+    <div class="ai-hero-edition">
+      <span>Ctrl+Alt+Orion LLC &mdash; Product Preview</span>
+      <span>Hospitality AI &mdash; Restricted Access</span>
+    </div>
+    <div class="ai-hero-body">
+      <div class="ai-kicker">
+        <span class="ai-kicker-badge">Coming Soon</span>
+        <span class="ai-kicker-label">An Exclusive from the Founder</span>
+      </div>
+      <h1 class="ai-headline">
+        The Back-of-House<br>
+        <span class="fancy">Operating System</span><br>
+        <span class="stamp">Restaurants Deserve</span>
+      </h1>
+      <div class="ai-rule"></div>
+      <p class="ai-lede">
+        We are building an <strong>AI-native operations platform</strong> for the restaurant and bar industry — starting with the most universally painful workflow in the business: <strong>tip-out and tip-pool automation</strong>. Every venue has its own rules. Current software handles only the easy cases. The rest is calculators, arguments, and lost trust.
+        <br><br>
+        We fix that. Describe your house policy in plain English. Our platform translates it into auditable, reproducible rules and handles the math every night at close.
+      </p>
+      <div class="ai-ctas">
+        <a href="#early" class="ai-btn-p">Request Early Access</a>
+        <a href="#modules" class="ai-btn-s">See the Platform</a>
+      </div>
+    </div>
+  </div>
+  <div class="ai-hero-right">
+    <p class="schema-title">Platform Architecture &mdash; v0.1 Spec</p>
+    <div class="ai-schematic">
+      <div class="schema-node">
+        <span class="snode-num">01</span>
+        <div class="snode-content">
+          <div class="snode-label">Tip-Out Engine</div>
+          <div class="snode-desc">Plain-English policy input → deterministic rules. End-of-shift math, distribution, notifications.</div>
+          <span class="snode-tag live">Wedge &mdash; Building Now</span>
+        </div>
+      </div>
+      <div class="schema-node">
+        <span class="snode-num">02</span>
+        <div class="snode-content">
+          <div class="snode-label">Dispute Resolution</div>
+          <div class="snode-desc">Every distribution is auditable. Explainable, traceable, defensible.</div>
+          <span class="snode-tag live">Wedge &mdash; Building Now</span>
+        </div>
+      </div>
+      <div class="schema-node">
+        <span class="snode-num">03</span>
+        <div class="snode-content">
+          <div class="snode-label">Shift Forecasting</div>
+          <div class="snode-desc">Historical tip data → predicted take-home before a server accepts a shift.</div>
+          <span class="snode-tag next">Roadmap</span>
+        </div>
+      </div>
+      <div class="schema-node">
+        <span class="snode-num">04</span>
+        <div class="snode-content">
+          <div class="snode-label">Scheduling + Compliance</div>
+          <div class="snode-desc">State-specific labor compliance, scheduling integration, payroll loop.</div>
+          <span class="snode-tag next">Roadmap</span>
+        </div>
+      </div>
+    </div>
+    <p class="schema-foot">Data compounds with each module. Tip-out feeds forecasting. Forecasting feeds scheduling.</p>
+  </div>
+</section>
+
+<!-- WEDGE: THE PROBLEM -->
+<section id="wedge">
+  <div class="inner">
+    <div class="left rv">
+      <div>
+        <div class="slabel">The Problem</div>
+        <h2 class="stitle">Every Venue Has<br>Its Own <em>Rules.</em><br>Nobody Has a<br>System.</h2>
+      </div>
+      <ul class="pain-list">
+        <li><span class="pain-num">—</span><div><span class="pain-glyph">Policy Chaos &nbsp;</span>Tip pools differ by state, by concept, by GM. Servers tip out bussers differently than barbacks. There is no standard.</div></li>
+        <li><span class="pain-num">—</span><div><span class="pain-glyph">Calculator Math &nbsp;</span>End of a busy Saturday night, someone's doing this on a phone calculator. Mistakes happen. Disputes follow.</div></li>
+        <li><span class="pain-num">—</span><div><span class="pain-glyph">No Audit Trail &nbsp;</span>When a server says the math was wrong, there's no log. Just memory and blame.</div></li>
+        <li><span class="pain-num">—</span><div><span class="pain-glyph">Software Gaps &nbsp;</span>Existing POS and payroll tools handle only the simplest cases. Complex house policies fall outside their scope — always.</div></li>
+      </ul>
+    </div>
+    <div class="divider"></div>
+    <div class="right rv d1">
+      <div class="slabel">Our Answer</div>
+      <h2 class="stitle">Describe Your<br>Policy. We<br>Handle the<br><em>Rest.</em></h2>
+      <p class="sdesc" style="margin-top:16px;">A general manager describes their house tip-out policy in plain English. Our LLM configuration layer translates it into a structured, auditable rules engine. Every distribution is calculated the same way, every night, with a full explanation attached.</p>
+      <div class="solution-box">
+        <div class="sol-label">Example Input</div>
+        <p>"Servers tip out 3% of food sales to bussers and 1.5% to food runners. Bar keeps its own tips. Managers are excluded from pools."</p>
+      </div>
+      <p class="sdesc" style="margin-top:20px;">That sentence becomes a reproducible rule set. Every edge case — split shifts, server-bartender combos, void comps — is handled deterministically and logged.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MODULES -->
+<section id="modules" class="sec">
+  <div class="slabel rv">The Platform</div>
+  <h2 class="stitle rv d1">Four Modules.<br>One <em>Compounding</em> Data Loop.</h2>
+  <p class="sdesc rv d2">Each module feeds the next. The more your venue uses it, the smarter it gets.</p>
+  <div class="mgrid">
+    <div class="mcard rv d1">
+      <div class="mcard-tag wedge">Wedge</div>
+      <div class="mcard-num">01</div>
+      <div class="mcard-icon">&#x2767;</div>
+      <div class="mcard-title">Tip-Out<br>Automation</div>
+      <p class="mcard-desc">Plain-English policy configuration over a deterministic rules engine. End-of-shift math, distribution notifications, and full audit trail. Built for venues with non-standard house policies.</p>
+    </div>
+    <div class="mcard rv d2">
+      <div class="mcard-tag next">Roadmap</div>
+      <div class="mcard-num">02</div>
+      <div class="mcard-icon">&#x25CB;</div>
+      <div class="mcard-title">Shift<br>Forecasting</div>
+      <p class="mcard-desc">Historical tip data from every closed shift feeds a predictive model. Servers see their expected take-home before they accept a shift. Scheduling decisions get smarter over time.</p>
+    </div>
+    <div class="mcard rv d3">
+      <div class="mcard-tag next">Roadmap</div>
+      <div class="mcard-num">03</div>
+      <div class="mcard-icon">&#x25A1;</div>
+      <div class="mcard-title">Manager<br>Assist AI</div>
+      <p class="mcard-desc">Live floor operations support. 86 tracking, table pacing, staffing alerts, and shift-level decision assist — surfacing the right information to the right person at the right time.</p>
+    </div>
+    <div class="mcard rv d4">
+      <div class="mcard-tag next">Roadmap</div>
+      <div class="mcard-num">04</div>
+      <div class="mcard-icon">&#x25B3;</div>
+      <div class="mcard-title">Compliance<br>Reporting</div>
+      <p class="mcard-desc">State-specific labor law compliance for tip credits, minimum wage make-up, and wage theft documentation. Automated reports for payroll, integrated into the data layer.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DATA LOOP -->
+<section id="loop" class="sec" style="padding-top:0;">
+  <div class="column-rule rv"></div>
+  <div class="slabel rv">The Compounding Advantage</div>
+  <h2 class="stitle rv d1">Data That Gets<br><em>Richer</em> Every Shift</h2>
+  <p class="sdesc rv d2">Each module reinforces the data layer beneath it. Tip-out history feeds shift forecasting, which feeds scheduling, which feeds payroll. The loop compounds.</p>
+  <div class="loop-diagram rv d3">
+    <div class="loop-step ls-active">
+      <div class="ls-num">01</div>
+      <div class="ls-name">Tip-Out</div>
+      <div class="ls-sub">Shift closes. Distribution calculated and logged.</div>
+    </div>
+    <div class="loop-arrow">&rsaquo;</div>
+    <div class="loop-step">
+      <div class="ls-num">02</div>
+      <div class="ls-name">History</div>
+      <div class="ls-sub">Earnings data accumulates per role, per day-part, per season.</div>
+    </div>
+    <div class="loop-arrow">&rsaquo;</div>
+    <div class="loop-step">
+      <div class="ls-num">03</div>
+      <div class="ls-name">Forecast</div>
+      <div class="ls-sub">Model predicts expected take-home for any shift slot.</div>
+    </div>
+    <div class="loop-arrow">&rsaquo;</div>
+    <div class="loop-step">
+      <div class="ls-num">04</div>
+      <div class="ls-name">Schedule</div>
+      <div class="ls-sub">Shift earnings estimates feed staffing decisions.</div>
+    </div>
+    <div class="loop-arrow">&rsaquo;</div>
+    <div class="loop-step">
+      <div class="ls-num">05</div>
+      <div class="ls-name">Payroll</div>
+      <div class="ls-sub">Full compliance reporting, automated and auditable.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOUNDER NOTE -->
+<section id="founder">
+  <div class="border-l"></div>
+  <div class="inner">
+    <div class="founder-kicker rv">A Note from the Founder</div>
+    <blockquote class="founder-quote rv d1">
+      "I built this because I <em>needed</em> it every<br>Saturday night at close."
+    </blockquote>
+    <div class="founder-body rv d2">
+      <p>I have spent years working front-of-house and back-of-house in restaurants and bars in Portland. I have done the tip-out math on my phone at 1am. I have watched arguments start because the server in section three got a different number than they expected and nobody could explain why.</p>
+      <p>The software that exists today handles the easy cases — standard pools, flat percentages, single-concept operations. The moment a venue has a non-standard policy, a split-shift edge case, or a multi-role night, you are back on the calculator. That is most venues.</p>
+      <p>The wedge is tip-out because it is the most painful, most universal, and most underserved workflow in the industry. But the real opportunity is the data layer it creates. A venue that runs tip-out through our system for six months has a distribution dataset that no forecasting product can replicate. That is the moat.</p>
+      <p>We are building this in Portland, with direct input from operators and staff. If you run a venue and want early access — or want to tell me everything that is wrong with the industry — reach out below.</p>
+    </div>
+    <div class="founder-sig rv d3">
+      <div>
+        <div class="founder-sig-name">Mitchell &mdash; Ctrl+Alt+Orion LLC</div>
+        <div class="founder-sig-title">Founder &mdash; FOH/BOH Veteran &mdash; Portland, OR</div>
+      </div>
+    </div>
+  </div>
+  <div class="border-r"></div>
+</section>
+
+<!-- EARLY ACCESS -->
+<section id="early">
+  <div class="early-label">Restricted Preview &mdash; Now Accepting Applicants</div>
+  <div class="early-inner">
+    <div class="early-left rv">
+      <h2 class="etitle">Get In<br>Before the<br><em>Doors Open.</em></h2>
+      <p class="edesc" style="margin-top:20px;">We are working with a small group of Portland-area restaurants and bars to pilot the tip-out engine before public launch. Early partners shape the product, lock in founding pricing, and get direct access to the team.</p>
+      <p class="edesc" style="margin-top:16px;">No commitment required. Just tell us about your venue and how your tip-out currently works.</p>
+    </div>
+    <div class="early-right rv d1">
+      <form class="early-form" onsubmit="handleEarly(event)">
+        <div class="ef-row">
+          <div class="ef-label">Venue Name</div>
+          <input class="ef-input" type="text" placeholder="The Pour House" autocomplete="off"/>
+        </div>
+        <div class="ef-row">
+          <div class="ef-label">Your Name &amp; Role</div>
+          <input class="ef-input" type="text" placeholder="Alex — GM / Owner" autocomplete="off"/>
+        </div>
+        <div class="ef-row">
+          <div class="ef-label">Email</div>
+          <input class="ef-input" type="email" placeholder="you@venue.com" autocomplete="off"/>
+        </div>
+        <div class="ef-row" style="border-bottom:none;">
+          <div class="ef-label">How do you currently handle tip-out?</div>
+          <input class="ef-input" type="text" placeholder="Spreadsheet, POS, calculator..." autocomplete="off"/>
+        </div>
+        <button type="submit" class="ef-submit">Request Early Access</button>
+        <p class="ef-note">We will reach out within 48 hours. Portland venues prioritized.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="flogo"><span class="fc">CTRL</span>+ALT+ORION</span>
+  <span class="fcopy">&copy; 2025 Ctrl+Alt+Orion LLC &mdash; Portland, OR</span>
+  <div class="flinks">
+    <a href="/">Home</a>
+    <a href="/#services">Services</a>
+    <a href="/#contact">Contact</a>
+  </div>
+</footer>
+
+<div id="hud"></div>
+
+<script>
+// Cursor
+const cd=document.getElementById('cd'),cr=document.getElementById('cr');
+let mx=0,my=0,cx=0,cy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cd.style.left=mx+'px';cd.style.top=my+'px';});
+(function lag(){cx+=(mx-cx)*.12;cy+=(my-cy)*.12;cr.style.left=cx+'px';cr.style.top=cy+'px';requestAnimationFrame(lag);})();
+document.querySelectorAll('a,button,input,.mcard').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('ch'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('ch'));
+});
+
+// Nav toggle
+function tm(){document.getElementById('mmenu').classList.toggle('open');}
+function cm(){document.getElementById('mmenu').classList.remove('open');}
+
+// Scroll reveal
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});},{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+
+// Form
+function handleEarly(e){
+  e.preventDefault();
+  const btn=e.target.querySelector('.ef-submit');
+  btn.textContent='Request Received — We\'ll Be In Touch';
+  btn.style.background='#1a1a1a';
+  btn.disabled=true;
+}
+
+// HUD
+const hud=document.getElementById('hud');
+let ht;
+window.addEventListener('scroll',()=>{
+  hud.classList.add('vis');
+  hud.textContent='scroll '+Math.round(window.scrollY)+'px';
+  clearTimeout(ht);ht=setTimeout(()=>hud.classList.remove('vis'),900);
+});
+</script>
+</body>
+</html>
