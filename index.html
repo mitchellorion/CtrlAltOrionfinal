@@ -52,22 +52,6 @@ body.ch #cd{background:var(--red);}
 /* newsprint noise */
 @keyframes noise{0%{background-position:0 0}100%{background-position:100% 100%}}
 
-/* AI ANNOUNCEMENT BAR */
-.ai-bar{display:flex;align-items:center;justify-content:center;gap:16px;height:34px;background:var(--ink);border-bottom:1px solid #2a2a2a;font-family:'ClevonStamp',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;overflow:hidden;position:relative;}
-.ai-bar::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 80px,rgba(255,255,255,.015) 80px,rgba(255,255,255,.015) 81px);pointer-events:none;}
-.ai-bar-badge{background:var(--red);color:#fff;padding:3px 9px;font-size:7px;letter-spacing:3px;font-family:'ClevonStamp',monospace;flex-shrink:0;}
-.ai-bar-text{color:rgba(255,255,255,.65);letter-spacing:2.5px;font-size:8px;}
-.ai-bar-text strong{color:rgba(255,255,255,.92);font-weight:normal;}
-.ai-bar-cta{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.85);padding:3px 12px;font-size:7px;letter-spacing:2px;text-decoration:none;text-transform:uppercase;font-family:'ClevonStamp',monospace;flex-shrink:0;transition:background .12s,border-color .12s,color .12s;}
-.ai-bar-cta:hover{background:var(--red);border-color:var(--red);color:#fff;}
-.ai-bar-divider{color:rgba(255,255,255,.2);font-size:10px;}
-.ai-dot{width:6px;height:6px;background:var(--red);border-radius:50%;flex-shrink:0;animation:blink 1.4s ease-in-out infinite;}
-
-/* NAV link — AI variant */
-.nav-links a.ai-link{color:var(--bg);background:var(--ink);letter-spacing:2px;gap:7px;}
-.nav-links a.ai-link::before{content:'';display:inline-block;width:5px;height:5px;background:var(--red);border-radius:50%;flex-shrink:0;animation:blink 1.4s ease-in-out infinite;}
-.nav-links a.ai-link:hover{background:var(--red);}
-.nav-links li.ai-li{border-left:var(--border-ink);}
 
 /* NAV — masthead */
 #nav{position:fixed;inset:0 0 auto 0;z-index:200;background:var(--bg);border-bottom:3px solid var(--ink);}
@@ -96,7 +80,7 @@ body.ch #cd{background:var(--red);}
 #mmenu a:hover{background:var(--light);}
 
 /* HERO — broadsheet layout */
-#hero{min-height:100vh;display:grid;grid-template-columns:1fr 40%;position:relative;overflow:hidden;padding-top:118px;border-bottom:var(--border-ink);}
+#hero{min-height:100vh;display:grid;grid-template-columns:1fr 40%;position:relative;overflow:hidden;padding-top:84px;border-bottom:var(--border-ink);}
 .hero-left{display:grid;grid-template-rows:auto 1fr;border-right:var(--border-ink);}
 .hero-col1{padding:40px 48px;display:flex;flex-direction:column;justify-content:flex-end;}
 .edition-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 48px;border-bottom:3px double var(--ink);background:var(--bg);}
@@ -323,9 +307,7 @@ footer{background:var(--ink);border-top:3px solid var(--ink);padding:24px 52px;d
   .hero-right{display:none;}
   #hero{grid-template-columns:1fr;}
   .hero-left{display:block;}
-  .hero-col1{padding:114px 24px 40px;}
-  .ai-bar-text{display:none;}
-  .ai-bar-divider{display:none;}
+  .hero-col1{padding:80px 24px 40px;}
   .edition-bar{padding:8px 24px;}
   .col-rule{grid-template-columns:1fr;}
   .col1{border-right:none;border-bottom:var(--border-ink);padding-right:0;padding-bottom:20px;margin-bottom:20px;}
@@ -434,19 +416,9 @@ footer{background:var(--ink);border-top:3px solid var(--ink);padding:24px 52px;d
   <a href="#about" onclick="cm()">About</a>
   <a href="#work" onclick="cm()">Work</a>
   <a href="#contact" onclick="cm()">Free Consult</a>
-  <a href="/ai" onclick="cm()" style="color:var(--red);display:flex;align-items:center;gap:12px;">
-    <span style="width:7px;height:7px;background:var(--red);border-radius:50%;flex-shrink:0;display:inline-block;animation:blink 1.4s ease-in-out infinite;"></span>What's Next?
-  </a>
 </div>
 
 <nav id="nav">
-  <div class="ai-bar">
-    <div class="ai-dot"></div>
-    <span class="ai-bar-badge">AI</span>
-    <span class="ai-bar-text"><strong>Now Building:</strong> AI-Native Ops Platform for Restaurants &amp; Bars</span>
-    <span class="ai-bar-divider">&mdash;</span>
-    <a href="/ai" class="ai-bar-cta">Early Access &rsaquo;</a>
-  </div>
   <div class="nav-top">
     <a class="nav-logo" href="#">
       <span class="nkm c">CTRL</span>+<span class="nkm">ALT</span>+<span>ORION</span>
@@ -458,7 +430,6 @@ footer{background:var(--ink);border-top:3px solid var(--ink);padding:24px 52px;d
       <li><a href="#about">About</a></li>
       <li><a href="#work">Work</a></li>
       <li><a href="#contact" class="cta">Free Consult</a></li>
-      <li class="ai-li"><a href="/ai" class="ai-link">What's Next?</a></li>
     </ul>
     <button id="nav-toggle" onclick="tm()"><span></span><span></span><span></span></button>
   </div>
@@ -467,11 +438,9 @@ footer{background:var(--ink);border-top:3px solid var(--ink);padding:24px 52px;d
       <span class="tick red">BREAKING:</span><span class="tick">Custom websites cost less than you think &mdash; and you own them forever</span>
       <span class="tick red">//</span><span class="tick">Portland dev available for new projects &mdash; no templates, no subscriptions</span>
       <span class="tick red">//</span><span class="tick">Shopify fees eating your margins? There's a better way</span>
-      <span class="tick red">// AI //</span><span class="tick">Tip-out automation for restaurants &mdash; end-of-shift math handled by AI, disputes resolved in plain English</span>
       <span class="tick red">//</span><span class="tick">BREAKING:</span><span class="tick">Custom websites cost less than you think &mdash; and you own them forever</span>
       <span class="tick red">//</span><span class="tick">Portland dev available for new projects &mdash; no templates, no subscriptions</span>
       <span class="tick red">//</span><span class="tick">Shopify fees eating your margins? There's a better way</span>
-      <span class="tick red">// AI //</span><span class="tick">Tip-out automation for restaurants &mdash; end-of-shift math handled by AI, disputes resolved in plain English</span>
     </div>
   </div>
 </nav>
